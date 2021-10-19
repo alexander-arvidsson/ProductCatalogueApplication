@@ -1,6 +1,6 @@
 using System;
 
-namespace ProjektIntroduktionTest.Data
+namespace ProductCatalogueApplication.Data
 {
     public class WeatherForecast
     {
