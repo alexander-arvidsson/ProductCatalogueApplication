@@ -43,5 +43,9 @@ namespace ProductCatalogueApplication.Data
             get { return _restockingdate; }
             set { _restockingdate = value; }
         }
+        public Product()
+        {
+
+        }
     }
 }
