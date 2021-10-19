@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ProductCatalogueApplication.Data;
+using ProjektIntroduktionTest.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ProductCatalogueApplication
+namespace ProjektIntroduktionTest
 {
     public class Startup
     {
@@ -31,10 +31,16 @@ namespace ProductCatalogueApplication
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
 
-            services.AddDbContext<WarehouseAutomationContext>(options =>
+            services.AddDbContext<Context>(opts =>
             {
-                options.UseSqlite("Data Source = warehouseautomation.db");
+                opts.UseSqlite("Data Source = library.db");
+
             });
+            services.AddScoped<CustomerRepository>();
+            services.AddScoped<OrderRepository>();
+            services.AddScoped<OrderLineRepository>();
+            services.AddScoped<ProductRepository>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
