@@ -30,6 +30,10 @@ namespace ProductCatalogueApplication
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
+            services.AddScoped<CustomerRepository>();
+            services.AddScoped<OrderRepository>();
+            services.AddScoped<OrderLineRepository>();
+            services.AddScoped<ProductRepository>();
 
             services.AddDbContext<WarehouseAutomationContext>(options =>
             {

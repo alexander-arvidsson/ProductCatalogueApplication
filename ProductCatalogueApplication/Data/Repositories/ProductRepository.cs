@@ -1,0 +1,26 @@
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
+
+namespace ProductCatalogueApplication.Data
+{
+    public class ProductRepository
+    {
+
+        private readonly WarehouseAutomationContext _context;
+
+
+        public ProductRepository(WarehouseAutomationContext context)
+        {
+            _context = context;
+        }
+
+        //Här kan vi lägga in metoder som rör Customer, bara för start en metod för att hämta alla customers som finns lagrade 
+        public async Task<List<Product>> GetProductsAsync()
+        {
+            return await _context.Products.ToListAsync();
+        }
+    }
+}
