@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ProjektIntroduktionTest.Data;
+using ProductCatalogueApplication.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ProjektIntroduktionTest
+namespace ProductCatalogueApplication
 {
     public class Startup
     {
@@ -35,7 +35,7 @@ namespace ProjektIntroduktionTest
             services.AddScoped<OrderLineRepository>();
             services.AddScoped<ProductRepository>();
 
-            services.AddDbContext<Context>(opts =>
+            services.AddDbContext<WarehouseAutomationContext>(opts =>
             {
                 opts.UseSqlite("Data Source = library.db");
 

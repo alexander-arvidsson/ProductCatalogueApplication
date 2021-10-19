@@ -1,8 +1,9 @@
+using ProductCatalogueApplication.Data;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ProjektIntroduktionTest.Data
+namespace ProductCatalogueApplication.Data
 {
     public class WeatherForecastService
     {
