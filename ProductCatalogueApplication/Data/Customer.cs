@@ -32,12 +32,16 @@ namespace ProductCatalogueApplication.Data
         }
 
         //+Orders : List<Order> 
-        //List<Order> orders = new List<Order>();
+        public List<Order> Orders
+        {
+            get { return _orders; }
+            set { _orders = value; }
+        }
 
         private int _id;
         private string _name;
         private string _phone;
         private string _email;
-
+        private List<Order> _orders;
     }
 }
