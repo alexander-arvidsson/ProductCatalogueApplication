@@ -1,6 +1,7 @@
 ﻿@page "/customers"
 @using ProductCatalogueApplication.Data
-@inject CustomerRepository customerRepo
+@using ProductCatalogueApplication.Data.Interfaces
+@inject ICustomerRepository customerRepo
 
 <h1>Display </h1>
 <div class="row bg-light">

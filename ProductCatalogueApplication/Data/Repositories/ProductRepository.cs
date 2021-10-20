@@ -3,6 +3,7 @@ using ProductCatalogueApplication.Data.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ProductCatalogueApplication.Data
@@ -22,6 +23,27 @@ namespace ProductCatalogueApplication.Data
         public async Task<List<Product>> GetProductsAsync()
         {
             return await _context.Products.ToListAsync();
+        }
+        public async void AddProductAsync(Product p)
+        {
+            _context.Products.Add(p);
+            await _context.SaveChangesAsync();
+        }
+        public async void RemoveProductAsync(Product p)
+        {
+            _context.Products.Remove(p);
+            await _context.SaveChangesAsync();
+        }
+        public async void UpdateProductAsync(Product p)
+        {
+            //_context.Products.Where(product => product.Id == p.Id)
+            _context.Products.Update(p);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Product>> DisplayZeroStockAsync()
+        {
+            return await _context.Products.Where(p => p.Stock == 0).ToListAsync();
         }
     }
 }

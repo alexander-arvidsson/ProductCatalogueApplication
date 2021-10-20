@@ -1,8 +1,44 @@
 ﻿@page "/products"
+@using ProductCatalogueApplication.Data.Interfaces
 @using ProductCatalogueApplication.Data
-@inject ProductRepository productRepo
+@inject IProductRepository productRepo
 
 <h1>Display </h1>
+<div class="row bg-light">
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Product Price</th>
+                <th>Product Stock</th>
+                <th>Product Description</th>
+                <th>Delete Product</th>
+                <th>Update Product</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (displayProducts.Any())
+            {
+                @foreach (var b in displayProducts)
+                {
+            <tr>
+
+                <td>@b.Id</td>
+                <td>@b.Name </td>
+                <td>@b.Price</td>
+                <td>@b.Stock</td>
+                <td>@b.Description</td>
+                <td><button class="btn btn-danger" @onclick="(() => RemoveProduct(b))">Delete</button></td>
+                <td><button class="btn btn-danger" @onclick="(() => SetProductForUpdate(b))">Update</button></td>
+
+            </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
 <div class="row bg-light">
     <table class="table table-bordered">
         <thead class="thead-dark">
@@ -15,9 +51,9 @@
             </tr>
         </thead>
         <tbody>
-            @if (displayProducts.Any())
+            @if (displayZeroStockProducts.Any())
             {
-                @foreach (var b in displayProducts)
+                @foreach (var b in displayZeroStockProducts)
                 {
                     <tr>
 
@@ -34,12 +70,90 @@
     </table>
 </div>
 
+<EditForm Model="@newProduct" OnValidSubmit="(() => AddProduct(newProduct))">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="name">Product name</label>
+        <input @bind-value="@newProduct.Name" type="text" />
+    </div>
+    <div class="form-group">
+        <label for="description">Description</label>
+        <input @bind-value="@newProduct.Description" type="text" />
+    </div>
+    <div class="form-group">
+        <label for="price">Product price</label>
+        <input @bind-value="@newProduct.Price" type="number" step="0.01" />
+    </div>
+    <div class="form-group">
+        <label for="stock">Stock</label>
+        <input @bind-value="@newProduct.Stock" type="number" />
+    </div>
+    <div class="form-group">
+        <label for="restockingdate">Restocking Date</label>
+        <input @bind-value="@newProduct.RestockingDate" type="date" />
+    </div>
+    <button class="btn btn-info" type="submit">Add Product</button>
+</EditForm>
+
+<EditForm Model="@updateProduct" OnValidSubmit="(() => UpdateProduct())">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="name">Product name</label>
+        <input @bind-value="@updateProduct.Name" type="text" />
+    </div>
+    <div class="form-group">
+        <label for="description">Description</label>
+        <input @bind-value="@updateProduct.Description" type="text" />
+    </div>
+    <div class="form-group">
+        <label for="price">Product price</label>
+        <input @bind-value="@updateProduct.Price" type="number" step="0.01"/>
+    </div>
+    <div class="form-group">
+        <label for="stock">Stock</label>
+        <input @bind-value="@updateProduct.Stock" type="number" />
+    </div>
+    <div class="form-group">
+        <label for="restockingdate">Restocking Date</label>
+        <input @bind-value="@updateProduct.RestockingDate" type="date" />
+    </div>
+    <button class="btn btn-info" type="submit">Update Product</button>
+</EditForm>
+
+
 
 @code{
     List<Product> displayProducts;
+    List<Product> displayZeroStockProducts;
 
     protected override async Task OnInitializedAsync()
     {
         displayProducts = await productRepo.GetProductsAsync();
+        displayZeroStockProducts = await productRepo.DisplayZeroStockAsync();
+    }
+
+    Product newProduct = new Product();
+    private void AddProduct(Product p)
+    {
+        productRepo.AddProductAsync(newProduct);
+        newProduct = new Product();
+    }
+
+    private void RemoveProduct(Product p)
+    {
+        productRepo.RemoveProductAsync(p);
+    }
+
+    Product updateProduct = new Product();
+    private void SetProductForUpdate(Product selected)
+    {
+        updateProduct = selected;
+    }
+
+    private void UpdateProduct()
+    {
+        productRepo.UpdateProductAsync(updateProduct);
     }
 }
