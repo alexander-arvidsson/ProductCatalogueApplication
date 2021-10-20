@@ -3,6 +3,7 @@ using ProductCatalogueApplication.Data.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ProductCatalogueApplication.Data
@@ -40,21 +41,18 @@ namespace ProductCatalogueApplication.Data
             _context.Update(customer);
         }
 
-        public async Task<List<Customer>> DisplayArchivedCustomerOrder(Order order)
+        public async Task<List<Order>> DisplayArchivedCustomerOrder(Customer customer)
         {
-            Task<List<Customer>> CustomerList =_context.Customers.ToListAsync();
 
-            CustomerList.Result
 
-                //where ...bool is true??
-
-            return await ...;
+            return await _context.Orders.Where(o => o.Dispatched == true && customer.Id == o.CustomerId).ToListAsync();
+            
         }
 
-        public async Task<List<Customer>> DisplayActiveCustomerOrder(Order order)
+        public async Task<List<Order>> DisplayActiveCustomerOrder(Customer customer)
         {
-            //where ...bool is true??
-            return await ...;
+            
+            return await _context.Orders.Where(o => o.Dispatched == false && customer.Id == o.CustomerId).ToListAsync();
         }
 
 
