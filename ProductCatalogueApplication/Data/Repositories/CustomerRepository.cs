@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProductCatalogueApplication.Data
 {
-    public class CustomerRepository
+    public class CustomerRepository : ICustomerRepository
     {
 
         private readonly WarehouseAutomationContext _context;

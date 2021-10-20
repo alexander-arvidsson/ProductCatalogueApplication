@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ProductCatalogueApplication.Data.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ProductCatalogueApplication.Data
 {
-    public class OrderRepository
+    public class OrderRepository : IOrderRepository
     {
 
         private readonly WarehouseAutomationContext _context;
