@@ -16,7 +16,7 @@ namespace ProductCatalogueApplication.Data
         private int _quantity;
 
         [Required]
-        [Range(0, int.MaxValue)]
+        [Range(1, int.MaxValue)]
         public int Id
         {
             get { return _id; }
