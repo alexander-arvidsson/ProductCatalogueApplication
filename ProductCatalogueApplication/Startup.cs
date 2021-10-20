@@ -37,13 +37,9 @@ namespace ProductCatalogueApplication
 
             services.AddDbContext<WarehouseAutomationContext>(opts =>
             {
-                opts.UseSqlite("Data Source = library.db");
+                opts.UseSqlite("Data Source = warehouseautomation.db");
 
             });
-            services.AddScoped<CustomerRepository>();
-            services.AddScoped<OrderRepository>();
-            services.AddScoped<OrderLineRepository>();
-            services.AddScoped<ProductRepository>();
 
         }
 

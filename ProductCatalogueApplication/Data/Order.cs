@@ -77,6 +77,5 @@ namespace ProductCatalogueApplication.Data
             get { return _items; }
             set { _items = value; }
         }
-
     }
 }

@@ -12,7 +12,12 @@ namespace ProductCatalogueApplication.Data
         private string _phone;
         private string _email;
         private List<Order> _orders;
-        
+
+        public Customer()
+        {
+            Orders = new List<Order>();
+        }
+
         //+Id : int
         [Required]
         [Range(0, int.MaxValue)]
