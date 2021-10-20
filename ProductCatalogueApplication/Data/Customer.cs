@@ -20,7 +20,7 @@ namespace ProductCatalogueApplication.Data
 
         //+Id : int
         [Required]
-        [Range(0, int.MaxValue)]
+        [Range(1, int.MaxValue)]
         public int Id
         {
             get { return _id; }
