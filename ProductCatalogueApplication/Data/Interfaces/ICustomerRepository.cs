@@ -12,5 +12,6 @@ namespace ProductCatalogueApplication.Data.Interfaces
         void UpdateCustomer(Customer customer);
         public Task<List<Order>> DisplayArchivedCustomerOrder(Customer customer);
         public Task<List<Order>> DisplayActiveCustomerOrder(Customer customer);
+        public Task<List<Customer>> GetCustomersAsync();
     }
 }

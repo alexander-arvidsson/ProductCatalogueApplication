@@ -36,7 +36,8 @@ namespace ProductCatalogueApplication.Data
         }
         public async void UpdateProductAsync(Product p)
         {
-            //_context.Products.Where(prod => prod.Id.StartsWith(p));
+            //_context.Products.Where(product => product.Id == p.Id)
+            _context.Products.Update(p);
             await _context.SaveChangesAsync();
         }
 
