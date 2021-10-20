@@ -24,7 +24,7 @@ namespace ProductCatalogueApplication.Data.Interfaces
 
         //en metod för att uppdatera en existerande order
 
-        public void UpdateOrder(Order toBeUpdated, Product product) //check att den stock och att den har payment completed om båda är sanna så blir det dispatched, om det inte är sant så blir den pending
+        public void UpdateOrder(Order toBeUpdated) //check att den stock och att den har payment completed om båda är sanna så blir det dispatched, om det inte är sant så blir den pending
         {
 
         }
