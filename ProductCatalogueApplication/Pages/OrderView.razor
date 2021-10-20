@@ -1,7 +1,9 @@
 ﻿@page "/orders"
 @using ProductCatalogueApplication.Data
+@using ProductCatalogueApplication.Data.Interfaces
 
-@inject OrderRepository orderRepo
+@inject IOrderRepository orderRepo
+
 
 <h1>Display </h1>
 <div class="row bg-light">
@@ -37,13 +39,68 @@
     </table>
 </div>
 
+Lägg en ny order
+<h1>Catalogue service </h1>
+<div class="container">
+    <EditForm Model="@newOrder" OnValidSubmit="(() => AddNewOrder(newOrder))">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="adress"> Order Adress </label>
+            <input @bind-value="@newOrder.DeliveryAdress" type="text" />
+
+        </div>
+        <div class="form-group">
+            <label for="date"> Order Date </label>
+            <input @bind-value="@newOrder.OrderDate" type="datetime" /> 
+
+        </div>
+        <div class="form-group">
+            <label for="customerId"> Customer Id </label>
+            <input @bind-value="@newOrder.CustomerId" type="number" /> 
+
+        </div>
+        
+
+
+        <button class="btn btn-info" type="submit"> Add Product </button> 
+    </EditForm>
+</div>
+<div class="container">
+    <EditForm Model="@updatedOrder">
+        
+        <button class="btn btn-info" @onclick="(() => UpdateOrder(updatedOrder, updatedProduct))"> Update Order </button> //skickar objektet newProduct till en metod AddProduct
+    </EditForm>
+</div>
 
 
 @code{
+
     List<Order> displayOrders;
 
     protected override async Task OnInitializedAsync()
     {
         displayOrders = await orderRepo.GetOrdersAsync();
     }
+    Order newOrder = new Order();
+    private void AddNewOrder(Order o) // vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
+    {
+        orderRepo.AddNewOrder(o);
+
+    }
+
+    private void ShowProducts() // vi vill ge användarna möjlighet att se vilka produkter som finns så att de kan lägga en order
+    {
+        //implementera en metod från ProductsRepository så att separationen håller
+        //skicka med stocken från en meny 
+    }
+
+    Order updatedOrder = new Order();
+    Product updatedProduct = new Product();
+
+    private void UpdateOrder( Order order, Product product) //får skicka med båda objekten så att vi kan hålla koll på stock osv
+    {
+        orderRepo.UpdateOrder(order, product);
+    }
+
 }
