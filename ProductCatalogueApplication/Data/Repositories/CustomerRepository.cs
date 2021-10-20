@@ -25,6 +25,7 @@ namespace ProductCatalogueApplication.Data
             return await _context.Customers.ToListAsync();
         }
 
+        //Customer Add metod
         public void AddCustomer(Customer customer)
         {
             _context.Add(customer);
@@ -43,6 +44,7 @@ namespace ProductCatalogueApplication.Data
         public async Task<List<Order>> DisplayArchivedCustomerOrder(Customer customer)
         {
 
+
             return await _context.Orders.Where(o => o.Dispatched == true && customer.Id == o.CustomerId).ToListAsync();
             
         }
@@ -52,6 +54,8 @@ namespace ProductCatalogueApplication.Data
             
             return await _context.Orders.Where(o => o.Dispatched == false && customer.Id == o.CustomerId).ToListAsync();
         }
+
+
 
     }
 }
