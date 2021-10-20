@@ -18,10 +18,6 @@ namespace ProductCatalogueApplication.Data
         public DbSet<OrderLine> OrderLines { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Order>().HasMany(c => c.Items).WithOne(i => i.Order); //En order har flera items genom Orderlists, varje orderlista är kopplad mot endast en order
-            modelBuilder.Entity<Customer>().HasMany(c => c.Orders).WithOne(i => i.Customer); //En kund har flera ordrar och varje order är bunden mot en kund
-            modelBuilder.Entity<OrderLine>().HasOne(c => c.Product); //En orderline har en produkt
-
             modelBuilder.Entity<Product>().HasData(GetProducts());
             modelBuilder.Entity<Customer>().HasData(GetCustomers());
             modelBuilder.Entity<Order>().HasData(GetOrders());
@@ -43,8 +39,10 @@ namespace ProductCatalogueApplication.Data
             {
                 new Product { Id = 1, Name = "Cake", Price = 12.46, Stock = 10, Description = "The  cake is a lie" },
                 new Product { Id = 2, Name = "A blue  pen", Price = 5.99, Stock = 50, Description = "It ’s a bluepen.." },
+                new Product { Id = 3, Name = "A black  pen", Price = 5.99, Stock = 0, Description = "It ’s a blackpen.." }
             };
         }
+
         private List<Order> GetOrders()
         {
             return new List<Order>
