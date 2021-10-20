@@ -23,5 +23,10 @@ namespace ProductCatalogueApplication.Data
         {
             return await _context.Products.ToListAsync();
         }
+        public async void AddProductAsync(Product p)
+        {
+            _context.Products.Add(p);
+            await _context.SaveChangesAsync();
+        }
     }
 }
