@@ -38,8 +38,7 @@ namespace ProductCatalogueApplication.Data
             return new List<Product>
             {
                 new Product { Id = 1, Name = "Cake", Price = 12.46, Stock = 10, Description = "The  cake is a lie" },
-                new Product { Id = 2, Name = "A blue  pen", Price = 5.99, Stock = 50, Description = "It ’s a bluepen.." },
-                new Product { Id = 3, Name = "A black  pen", Price = 5.99, Stock = 0, Description = "It ’s a blackpen.." }
+                new Product { Id = 2, Name = "A blue  pen", Price = 5.99, Stock = 50, Description = "It ’s a bluepen.." }
             };
         }
 

@@ -15,16 +15,14 @@ namespace ProductCatalogueApplication.Data
         private int _stock;
         private DateTime _restockingdate;
 
-        [Required]
-        [Range(1, int.MaxValue)]
         public int Id
         {
             get { return _id; }
             set { _id = value; }
         }
 
-        [Required]        //[StringLength(20, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 3)]
-        [StringLength(20, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
+        [Required] //Längden måste vara minst 1 tecken och max 30.
+        [StringLength(30, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
         public string Name
         {
             get { return _name; }
@@ -39,7 +37,7 @@ namespace ProductCatalogueApplication.Data
         }
 
         [Required]
-        [Range(0, double.MaxValue)]
+        [Range(0, double.MaxValue)] //Priset behöver vara minst 0
         public double Price
         {
             get { return _price; }
@@ -47,7 +45,7 @@ namespace ProductCatalogueApplication.Data
         }
 
         [Required]
-        [Range(0, int.MaxValue)] //tog bara ett random värde som säger att vi inte kan gå under 0 i stock eller över 9999
+        [Range(0, 9999)] //tog bara ett random värde som säger att vi inte kan gå under 0 i stock eller över 9999
         public int Stock
         {
             get { return _stock; }
