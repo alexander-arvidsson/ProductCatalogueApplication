@@ -18,9 +18,9 @@ namespace ProductCatalogueApplication.Data
         public DbSet<OrderLine> OrderLines { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Order>().HasMany(c => c.Items).WithOne(i => i.Order); //En order har flera items genom Orderlists, varje orderlista är kopplad mot endast en order
-            modelBuilder.Entity<Customer>().HasMany(c => c.Orders).WithOne(i => i.Customer); //En kund har flera ordrar och varje order är bunden mot en kund
-            modelBuilder.Entity<OrderLine>().HasOne(c => c.Product); //En orderline har en produkt
+            //modelBuilder.Entity<Order>().HasMany(c => c.Items).WithOne(i => i.Order); //En order har flera items genom Orderlists, varje orderlista är kopplad mot endast en order
+            //modelBuilder.Entity<Customer>().HasMany(c => c.Orders).WithOne(i => i.Customer); //En kund har flera ordrar och varje order är bunden mot en kund
+            //modelBuilder.Entity<OrderLine>().HasOne(c => c.Product); //En orderline har en produkt
 
             modelBuilder.Entity<Product>().HasData(GetProducts());
             modelBuilder.Entity<Customer>().HasData(GetCustomers());
