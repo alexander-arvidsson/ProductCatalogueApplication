@@ -1,9 +1,10 @@
 ﻿@page "/customers"
 @using ProductCatalogueApplication.Data
 @using ProductCatalogueApplication.Data.Interfaces
+@inject IOrderRepository orderRepo
 @inject ICustomerRepository customerRepo
 
-<h1>Display </h1>
+<h1>Customers </h1>
 <div class="row bg-light">
     <table class="table table-bordered">
         <thead class="thead-dark">
@@ -12,7 +13,12 @@
                 <th>Customer Name</th>
                 <th>Customer E-mail</th>
                 <th>Customer Telephone</th>
-                <th>Remove Customer</th>
+                @if (IsInspecting == false)
+                {
+                    <th>Remove Customer</th>
+                    <th>Update Customer</th>
+                    <th>Inspect Customer</th>
+                }
             </tr>
         </thead>
         <tbody>
@@ -20,61 +26,186 @@
             {
                 @foreach (var b in displayCustomers)
                 {
-            <tr>
-
-                <td>@b.Id</td>
-                <td>@b.Name </td>
-                <td>@b.Email</td>
-                <td>@b.Phone</td>
-                <td><button class="btn btn-danger" type="submit">Remove Customer</button></td>
-
-            </tr>
-
-
+                    <tr>
+                        <td>@b.Id</td>
+                        <td>@b.Name </td>
+                        <td>@b.Email</td>
+                        <td>@b.Phone</td>
+                        @if (IsInspecting == false)
+                        {
+                            <td><button class="btn btn-danger" @onclick="(() => RemoveCustomer(b))">Remove Customer</button></td>
+                            <td><button class="btn btn-outline-info" @onclick="(() => SelectToUpdate(b))">Update Customer</button></td>
+                            <td><button class="btn btn-outline-info" @onclick="(() => InspectCustomer(b))">Inspect Customer</button></td>
+                        }
+                    </tr>
                 }
             }
         </tbody>
     </table>
 </div>
 
+@if (IsInspecting == true)
+{
+    <h1>Orders </h1>
+    @if (customerOrders.Any())
+    {
+        <select type="text" id="products" class="form-control select-picker" @bind="@FilterFunction">
+            <option value="1">All archived orders</option>
+            <option value="2">All active orders</option>
+        </select>
+        <button class="btn btn-info" type="button" @onclick="(() => FilterGUI(selectedCustomer))">Filter</button>
+        <p></p>
+        <div class="row bg-light">
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Delivery Adress</th>
+                        <th>Order Date</th>
+                        <th>Payment Completed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var b in customerOrders)
+                    {
+                        <tr>
 
-<EditForm Model="@newCustomer" OnValidSubmit="(() => AddCustomer(newCustomer))">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    
-    <div class="form-group">
-        <label for="name">Customer name</label>
-        <input @bind-value="@newCustomer.Name" type="text" />
-    </div>
-    <div class="form-group">
-        <label for="email">Customer Email</label>
-        <input @bind-value="@newCustomer.Email" type="text" step="0.01" />
-    </div>
-    <div class="form-group">
-        <label for="phone">Customer Phone</label>
-        <input @bind-value="@newCustomer.Phone" type="text" />
-    </div>
+                            <td>@b.Id</td>
+                            <td>@b.DeliveryAdress </td>
+                            <td>@b.OrderDate</td>
+                            <td>@b.PaymentCompleted</td>
+                        </tr>
 
-    <button class="btn btn-info" type="submit">Add Customer</button>
-</EditForm>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <tr>
+            <td> No orders found... </td>
+        </tr>
+    }
+    <br>
+    <td><button class="btn btn-outline-info" @onclick="(() => OnInitializedAsync())">Back</button></td>
+}
 
+
+@if (IsInspecting == false)
+{
+    <EditForm Model="@newCustomer" OnValidSubmit="(() => AddCustomer(newCustomer))">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="name">Customer Name</label>
+            <input @bind-value="@newCustomer.Name" type="text" />
+        </div>
+        <div class="form-group">
+            <label for="email">Customer Email</label>
+            <input @bind-value="@newCustomer.Email" type="text" step="0.01" />
+        </div>
+        <div class="form-group">
+            <label for="phone">Customer Phone</label>
+            <input @bind-value="@newCustomer.Phone" type="text" />
+        </div>
+
+        <button class="btn btn-info" type="submit">Add Customer</button>
+    </EditForm>
+}
+
+@if (IsUpdating == true)
+{
+    <EditForm Model="@updateCustomer" OnValidSubmit="(() => UpdateCustomer(updateCustomer))">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="name">Customer Name</label>
+            <input @bind-value="@updateCustomer.Name" type="text" />
+        </div>
+        <div class="form-group">
+            <label for="email">Customer Email</label>
+            <input @bind-value="@updateCustomer.Email" type="text" step="0.01" />
+        </div>
+        <div class="form-group">
+            <label for="phone">Customer Phone</label>
+            <input @bind-value="@updateCustomer.Phone" type="text" />
+        </div>
+
+        <button class="btn btn-info" type="submit">Update Customer</button>
+    </EditForm>
+}
 
 @code{
-    List<Customer> displayCustomers;
+    private List<Customer> displayCustomers;
+    private List<Order> customerOrders;
+    private Customer newCustomer = new Customer();
+    private Customer updateCustomer = new Customer();
+    private Customer selectedCustomer;
+    private bool IsUpdating;
+    private bool IsInspecting;
 
     protected override async Task OnInitializedAsync()
     {
         displayCustomers = await customerRepo.GetCustomersAsync();
+        IsInspecting = false;
     }
 
     //Lägg till en metod som sparar i databasen!
 
-    Customer newCustomer = new Customer();
-
-    private async void AddCustomer(Customer customer)
+    private void AddCustomer(Customer customer)
     {
         customerRepo.AddCustomer(newCustomer);
-        newCustomer = new Customer();
-        displayCustomers = await customerRepo.GetCustomersAsync();
+        displayCustomers.Add(customer);
     }
+
+    private void RemoveCustomer(Customer customer)
+    {
+        customerRepo.RemoveCustomer(customer);
+        displayCustomers.Remove(customer);
+    }
+
+    private void UpdateCustomer(Customer customer)
+    {
+        customerRepo.UpdateCustomer(customer);
+        IsUpdating = false;
+    }
+
+
+    private void SelectToUpdate(Customer updated)
+    {
+        updateCustomer = updated;
+        IsUpdating = true;
+    }
+
+    private async void InspectCustomer(Customer customer)
+    {
+        List<Order> getOrders = new List<Order>();
+        getOrders = await orderRepo.GetOrdersAsync();
+        IsInspecting = true;
+        selectedCustomer = customer;
+
+        displayCustomers = displayCustomers.Where(c => c.Id == customer.Id).ToList();
+        customerOrders = getOrders.Where(c => c.CustomerId == customer.Id).ToList();
+    }
+
+    public string FilterFunction { get; set; }
+    private async void FilterGUI(Customer c)
+    {
+        switch (FilterFunction)
+        {
+            case "1":
+                customerOrders = await customerRepo.DisplayArchivedCustomerOrder(c);
+                break;
+            case "2":
+                customerOrders = await customerRepo.DisplayActiveCustomerOrder(c);
+                break;
+            default:
+                customerOrders = await customerRepo.DisplayArchivedCustomerOrder(c);
+                break;
+        }
+    }
+
 }
