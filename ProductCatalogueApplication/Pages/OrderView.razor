@@ -5,7 +5,7 @@
 @inject IOrderRepository orderRepo
 
 
-<h1>Display </h1>
+<h1 class="alert-light">Existerande ordrar </h1>
 <div class="row bg-light">
     <table class="table table-bordered">
         <thead class="thead-dark">
@@ -16,6 +16,8 @@
                 <th>Dispatched</th>
                 <th>Order Date</th>
                 <th>Payment Completed</th>
+                <th class="bg-success">Update</th>
+
             </tr>
         </thead>
         <tbody>
@@ -23,119 +25,100 @@
             {
                 @foreach (var b in displayOrders)
                 {
-                    <tr>
+            <tr>
 
-                        <td>@b.Id</td>
-                        <td>@b.CustomerId</td>
-                        <td>@b.DeliveryAdress </td>
-                        <td>@b.Dispatched</td>
-                        <td>@b.OrderDate</td>
-                        <td>@b.PaymentCompleted</td>
+                <td>@b.Id</td>
+                <td>@b.CustomerId</td>
+                <td>@b.DeliveryAdress </td>
+                <td>@b.Dispatched</td>
+                <td>@b.OrderDate</td>
+                <td>@b.PaymentCompleted</td>
+                <td>
+                    <button class="btn btn-outline-success" type="button" @onclick="(() => UpdateOrder(b))"> Update </button>
+                </td>
 
-                    </tr>
+            </tr>
                 }
             }
         </tbody>
     </table>
 </div>
 
-Lägg en ny order
-<h1>Catalogue service </h1>
+
+
+<h2 class="alert-light">Lägg en ny order och välj sedan vilka items som ska inkluderas </h2>
 <div class="container">
-    <EditForm Model="@newOrder" OnValidSubmit="(() => AddNewOrder(newOrder))">
+    <EditForm Model="@prepNewOrder" OnValidSubmit="(() => PrepareNewOrder(prepNewOrder))">
         <DataAnnotationsValidator />
         <ValidationSummary />
         <div class="form-group">
             <label for="adress"> Order Adress </label>
-            <input @bind-value="@newOrder.DeliveryAdress" type="text" />
+            <input @bind-value="@prepNewOrder.DeliveryAdress" type="text" />
 
         </div>
         <div class="form-group">
             <label for="date"> Order Date </label>
-            <input @bind-value="@newOrder.OrderDate" type="datetime" />
+            <input @bind-value="@prepNewOrder.OrderDate" type="datetime" />
 
         </div>
         <div class="form-group">
             <label for="customerId"> Customer Id </label>
-            <input @bind-value="@newOrder.CustomerId" type="number" />
+            <input @bind-value="@prepNewOrder.CustomerId" type="number" />
 
         </div>
 
 
 
-        <button class="btn btn-info" type="submit"> Add Order </button>
+        <button class="btn btn-success" type="submit"> Add Order </button>
     </EditForm>
 </div>
+@if (readyOrderLines)
+{
+    <h2>Välj vilka items som ska inkluderas i ordern </h2>
+    <div class="container">
+        <EditForm Model="@prepNewOrderLine" OnValidSubmit="(() => PrepareNewOrderLine(prepNewOrderLine))">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="date"> ProductId </label>
+                <input @bind-value="@prepNewOrderLine.ProductId" type="datetime" />
 
-<div class="container">
-    @if (!displayOrders.Any())
-    {
-        <p> <em>No orders currently exist</em></p>
+            </div>
+            <div class="form-group">
+                <label for="customerId"> Quantity </label>
+                <input @bind-value="@prepNewOrderLine.Quantity" type="number" />
 
-    }
-    else
-    {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th> Orders information</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var ord in displayOrders) //onclick gör nu att raden förbereder sig på uppdateringar, de uppdateras först närman klickar på update
-                {
-                    <tr @onclick="(() => SetOrderForUpdate(ord))">
-                        <td> @ord.CustomerId </td>
-                        <td> @ord.DeliveryAdress kr</td>
-                        <td>
-                            <button class="btn btn-success" @onclick="(() => UpdateOrder(ord))"> Update </button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
+            </div>
 
 
-</div>
 
-Förbered din order
-<h1>OrderLine</h1>
-<div class="container">
-   
-<EditForm Model="@newOrderLine" OnValidSubmit="(() => AddNewOrderLine(newOrderLine))">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="form-group">
-        <label for="adress"> Order Adress </label>
-        <input @bind-value="@newOrderLine.ProductId" type="text" />
-
+            <button class="btn btn-outline-secondary" type="submit"> Add item to your current order </button>
+        </EditForm>
     </div>
-    <div class="form-group">
-        <label for="date"> Order Date </label>
-        <input @bind-value="@newOrderLine.Quantity" type="datetime" />
 
-    </div>
-        
+}
+else
+{
+    <p> <em>Skapa en order innan du kan lägga till items</em></p>
+
+}
 
 
-    <button class="btn btn-info" type="submit"> Add Order </button>
-</EditForm>
-
-    
-
-</div>
 
 
 
 
 @code{
+    Order prepNewOrder = new Order();
+    OrderLine prepNewOrderLine = new OrderLine();
+
+
+
+    bool readyOrderLines = false;
 
     List<Order> displayOrders;
     List<OrderLine> prepareOrderLine;
-    List<Order> activeOrders = new List<Order>();
-    //antingen göra en lista med alla produkter som finns som man kan beställa
-    //eller bara ett formulär
+
 
 
     protected override async Task OnInitializedAsync()
@@ -145,43 +128,49 @@ Förbered din order
 
     }
 
-    Order newOrder = new Order();
-    OrderLine newOrderLine = new OrderLine();
 
-    private void AddNewOrder(Order o) // vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
+
+    private void PrepareNewOrderLine(OrderLine addOrderLine) //////////////
+    {
+        //gör en metod där jag gör en orderlist som är kopplad mot det tidigare prepOrder objektet
+
+        orderRepo.AddNewOrderLine(addOrderLine, prepNewOrder);
+    }
+    private void AddNewOrder(Order o) /////////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
     {
         //en order måste ha en kund, om den inte finns så kan den inte skapas
         orderRepo.AddNewOrder(o);
-        activeOrders.Add(o); //lägger till i denna lista tillfälligt för att göra så att vi kan gå vidare till orderlines
 
     }
-
-    private void ShowProducts() // vi vill ge användarna möjlighet att se vilka produkter som finns så att de kan lägga en order
+    private void PrepareNewOrder(Order prepareForOrder) //////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
     {
-        //implementera en metod från ProductsRepository så att separationen håller
-        //skicka med stocken från en meny
+        //en order måste ha en kund, om den inte finns så kan den inte skapas
+        //placeOrder = true;
+        readyOrderLines = true;
+
+        orderRepo.AddNewOrder(prepareForOrder); //lägger till okbjektet
+                                                //activeOrders.Add(o); //lägger till i denna lista tillfälligt för att göra så att vi kan gå vidare till orderlines
+
     }
+
+
+
+
+    //uppdateringsfunktinoalitet för ordrar
 
     Order updatedOrder = new Order();
     //Product updatedProduct = new Product();
 
-    private void SetOrderForUpdate(Order selected)
-    {
-        updatedOrder = selected;
-    }
+    
 
     private void UpdateOrder(Order order) //får skicka med båda objekten så att vi kan hålla koll på stock osv
     {
         orderRepo.UpdateOrder(order);
-        if (order.PaymentCompleted == false)
-        {
-            //meddela att stock är noll
-        }
+        
     }
 
-    private void AddNewOrderLine(OrderLine ol)
-    {
-        orderRepo.AddNewOrderLine(ol);
-    }
+
+
+
 
 }

@@ -37,14 +37,20 @@ namespace ProductCatalogueApplication.Data
             _context.SaveChanges();
         }
 
-        public void AddNewOrderLine(OrderLine newOrderLine)
+        public void AddNewOrderLine(OrderLine newOrderLine, Order OrderToMatch)
         {
             //_context.Add(newOrder);        //en order m?ste ha en kund, om den inte finns s? kan den inte skapas s? vi g?r det nu
             //vi hittar v?ran customer fr?n att vi s?ker efter customerId
-            Order getOrderId = _context.Orders.Where(ol => ol.Id == newOrderLine.OrderId).FirstOrDefault(); //letar efter matchande?keys f?r att tillslut hitta Produkten som ?r kopppad s? vi kan f? stock som ?r en produkt egenksap
-            newOrderLine.OrderId = getOrderId.Id;
+            //Order getOrderId = _context.Orders.Where(ol => ol.Id == newOrderLine.OrderId).FirstOrDefault(); //letar efter matchande?keys f?r att tillslut hitta Produkten som ?r kopppad s? vi kan f? stock som ?r en produkt egenksap
+            //newOrderLine.OrderId = getOrderId.Id;
+
+            //måste få korrekt order Id innan jag hämtar order
+            newOrderLine.OrderId = OrderToMatch.Id;
+            newOrderLine.Order = _context.Orders.Where(ol => ol.Id == newOrderLine.OrderId).FirstOrDefault();
+
+
             //Vi tar fram ordern som matchar via nycklarna f?r att d? f? fram dens order id och kunna ge till orderLinen
-            newOrderLine.Order = _context.Orders.Where(ol => ol.Id == newOrderLine.OrderId).FirstOrDefault(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
+            //newOrderLine.Order = _context.Orders.Where(ol => ol.Id == newOrderLine.OrderId).FirstOrDefault(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
             newOrderLine.Product = _context.Products.Where(ol => ol.Id == newOrderLine.ProductId).FirstOrDefault(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
 
             _context.OrderLines.Add(newOrderLine);

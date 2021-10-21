@@ -14,7 +14,7 @@ namespace ProductCatalogueApplication.Data.Interfaces
         public void AddNewOrder(Order newOrder)
         {
         }
-        public void AddNewOrderLine(OrderLine newOrderLine)
+        public void AddNewOrderLine(OrderLine newOrderLine, Order matchingOrder)
         {
         }
 
