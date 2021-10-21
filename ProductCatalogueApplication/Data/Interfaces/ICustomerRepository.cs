@@ -13,5 +13,6 @@ namespace ProductCatalogueApplication.Data.Interfaces
         public Task<List<Order>> DisplayArchivedCustomerOrder(Customer customer);
         public Task<List<Order>> DisplayActiveCustomerOrder(Customer customer);
         public Task<List<Customer>> GetCustomersAsync();
+        public Task<List<Customer>> GetCustomersAsync(int id);
     }
 }

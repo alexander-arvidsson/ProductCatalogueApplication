@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using ProductCatalogueApplication.Data.Interfaces;
 
 namespace ProductCatalogueApplication.Data
 {
@@ -26,10 +25,16 @@ namespace ProductCatalogueApplication.Data
             return await _context.Customers.ToListAsync();
         }
 
+        public async Task<List<Customer>> GetCustomersAsync(int id)
+        {
+            return await _context.Customers.Where(c => c.Id == id).ToListAsync();
+        }
+
         //Customer Add metod
         public void AddCustomer(Customer customer)
         {
             _context.Add(customer);
+            _context.SaveChanges();
         }
 
         public void RemoveCustomer(Customer customer)
