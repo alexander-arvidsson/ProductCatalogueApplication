@@ -18,6 +18,8 @@ namespace ProductCatalogueApplication.Data
             Orders = new List<Order>();
         }
 
+        //+Id : int
+       
         public int Id
         {
             get { return _id; }

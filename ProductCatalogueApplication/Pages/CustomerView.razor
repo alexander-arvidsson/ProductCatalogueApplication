@@ -12,11 +12,12 @@
                 <th>Customer Name</th>
                 <th>Customer E-mail</th>
                 <th>Customer Telephone</th>
+                <th>Remove Customer</th>
             </tr>
         </thead>
         <tbody>
             @if (displayCustomers.Any())
-            { 
+            {
                 @foreach (var b in displayCustomers)
                 {
             <tr>
@@ -25,78 +26,55 @@
                 <td>@b.Name </td>
                 <td>@b.Email</td>
                 <td>@b.Phone</td>
-                <td><button class="btn btn-danger" @onclick="(() => SetForUpdate(b))">Update</button></td>
+                <td><button class="btn btn-danger" type="submit">Remove Customer</button></td>
 
             </tr>
+
+
                 }
             }
         </tbody>
     </table>
 </div>
 
-<EditForm Model="@customer" OnValidSubmit="(() => AddCustomer(customer))">
+
+<EditForm Model="@newCustomer" OnValidSubmit="(() => AddCustomer(newCustomer))">
     <DataAnnotationsValidator />
     <ValidationSummary />
+    
     <div class="form-group">
         <label for="name">Customer name</label>
-        <input @bind-value="@customer.Name" type="text" />
+        <input @bind-value="@newCustomer.Name" type="text" />
     </div>
     <div class="form-group">
-        <label for="description">Phone Number</label>
-        <input @bind-value="@customer.Phone" type="text" />
+        <label for="email">Customer Email</label>
+        <input @bind-value="@newCustomer.Email" type="text" step="0.01" />
     </div>
     <div class="form-group">
-        <label for="price">Email</label>
-        <input @bind-value="@customer.Email" type="email" step="0.01" />
+        <label for="phone">Customer Phone</label>
+        <input @bind-value="@newCustomer.Phone" type="text" />
     </div>
+
     <button class="btn btn-info" type="submit">Add Customer</button>
 </EditForm>
 
-<EditForm Model="@customer" OnValidSubmit="(() => UpdateCustomer(customer))">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="form-group">
-        <label for="name">Customer name</label>
-        <input @bind-value="@customer.Name" type="text" />
-    </div>
-    <div class="form-group">
-        <label for="description">Phone Number</label>
-        <input @bind-value="@customer.Phone" type="text" />
-    </div>
-    <div class="form-group">
-        <label for="price">Email</label>
-        <input @bind-value="@customer.Email" type="email" step="0.01" />
-    </div>
-    <button class="btn btn-info" type="submit">Add Customer</button>
-</EditForm>
 
 @code{
-
-    private List<Customer> displayCustomers;
-    private List<Customer> updatedCustomer;
-    private Customer customer = new Customer();
-
-    private async void AddCustomer(Customer c)
-    {
-        customerRepo.AddCustomer(c);
-        customer = new Customer();
-        updatedCustomer = await customerRepo.GetCustomersAsync(c.Id);
-
-        displayCustomers.Add(updatedCustomer.First());
-    }
-
-    private void SetForUpdate(Customer updated)
-    {
-        customer = updated;
-    }
-
-    private void UpdateCustomer(Customer c)
-    {
-        customerRepo.UpdateCustomer(c);
-    }
+    List<Customer> displayCustomers;
 
     protected override async Task OnInitializedAsync()
     {
+        displayCustomers = await customerRepo.GetCustomersAsync();
+    }
+
+    //Lägg till en metod som sparar i databasen!
+
+    Customer newCustomer = new Customer();
+
+    private async void AddCustomer(Customer customer)
+    {
+        customerRepo.AddCustomer(newCustomer);
+        newCustomer = new Customer();
         displayCustomers = await customerRepo.GetCustomersAsync();
     }
 }
