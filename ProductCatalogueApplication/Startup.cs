@@ -34,7 +34,6 @@ namespace ProductCatalogueApplication
             services.AddSingleton<WeatherForecastService>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
-            services.AddScoped<OrderLineRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
 
             services.AddDbContext<WarehouseAutomationContext>(opts =>
