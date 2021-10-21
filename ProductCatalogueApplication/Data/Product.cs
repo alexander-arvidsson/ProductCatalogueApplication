@@ -22,7 +22,7 @@ namespace ProductCatalogueApplication.Data
         }
 
         [Required] //Längden måste vara minst 1 tecken och max 30.
-        [StringLength(30, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
+        [StringLength(30, ErrorMessage = " {0} length must be between {2} and {1}.", MinimumLength = 1)]
         public string Name
         {
             get { return _name; }
@@ -45,7 +45,7 @@ namespace ProductCatalogueApplication.Data
         }
 
         [Required]
-        [Range(0, 9999)] //tog bara ett random värde som säger att vi inte kan gå under 0 i stock eller över 9999
+        [Range(0, 9999, ErrorMessage = " {0} must be between {1} and {2}.")] //tog bara ett random värde som säger att vi inte kan gå under 0 i stock eller över 9999
         public int Stock
         {
             get { return _stock; }
