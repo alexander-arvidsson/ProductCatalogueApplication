@@ -3,14 +3,16 @@
 @using ProductCatalogueApplication.Data
 @inject IProductRepository productRepo
 
-<h1>Display </h1>
+<h1>Products</h1>
+<hr>
 
 <select type="text" id="products" class="form-control select-picker" @bind="@FilterFunction">
     <option value="1">All products</option>
     <option value="2">All products not in stock</option>
 </select>
+<br>
 <button class="btn btn-info" type="button" @onclick="@FilterGUI">Filter</button>
-
+<p></p>
 <div class="row bg-light">
     <table class="table table-bordered">
         <thead class="thead-dark">
@@ -45,7 +47,7 @@
         </tbody>
     </table>
 </div>
-
+<br>
 <EditForm Model="@newProduct" OnValidSubmit="(() => AddProduct(newProduct))">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -67,7 +69,7 @@
     </div>
     <button class="btn btn-info" type="submit">Add Product</button>
 </EditForm>
-
+<hr>
 <EditForm Model="@updateProduct" OnValidSubmit="(() => UpdateProduct())">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -87,13 +89,9 @@
         <label for="stock">Stock</label>
         <input @bind-value="@updateProduct.Stock" type="number" />
     </div>
-    <div class="form-group">
-        <label for="restockingdate">Restocking Date</label>
-        <input @bind-value="@updateProduct.RestockingDate" type="date" />
-    </div>
     <button class="btn btn-info" type="submit">Update Product</button>
 </EditForm>
-
+<hr>
 
 
 @code{
