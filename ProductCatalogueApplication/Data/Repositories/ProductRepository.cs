@@ -24,23 +24,21 @@ namespace ProductCatalogueApplication.Data
         {
             return await _context.Products.ToListAsync();
         }
-        public async void AddProductAsync(Product p)
+        public void AddProduct(Product p)
         {
             _context.Products.Add(p);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
         }
-        public async void RemoveProductAsync(Product p)
+        public void RemoveProduct(Product p)
         {
             _context.Products.Remove(p);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
         }
-        public async void UpdateProductAsync(Product p)
+        public void UpdateProduct(Product p)
         {
-            //_context.Products.Where(product => product.Id == p.Id)
             _context.Products.Update(p);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
         }
-
         public async Task<List<Product>> DisplayZeroStockAsync()
         {
             return await _context.Products.Where(p => p.Stock == 0).ToListAsync();
