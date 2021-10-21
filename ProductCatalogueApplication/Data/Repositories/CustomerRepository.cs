@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
+
 namespace ProductCatalogueApplication.Data
 {
     public class CustomerRepository : ICustomerRepository
@@ -29,6 +30,7 @@ namespace ProductCatalogueApplication.Data
         public void AddCustomer(Customer customer)
         {
             _context.Add(customer);
+            _context.SaveChanges();
         }
 
         public void RemoveCustomer(Customer customer)
