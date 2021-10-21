@@ -60,7 +60,9 @@
 
 
 @code{
-    List<Customer> displayCustomers;
+    private List<Customer> displayCustomers;
+    private List<Customer> singeCustomer;
+    private Customer newCustomer = new Customer();
 
     protected override async Task OnInitializedAsync()
     {
@@ -69,12 +71,10 @@
 
     //Lägg till en metod som sparar i databasen!
 
-    Customer newCustomer = new Customer();
-
     private async void AddCustomer(Customer customer)
     {
         customerRepo.AddCustomer(newCustomer);
-        newCustomer = new Customer();
-        displayCustomers = await customerRepo.GetCustomersAsync();
+        singeCustomer = await customerRepo.GetCustomersAsync(customer.Id);
+        displayCustomers.Add(singeCustomer.First());
     }
 }
