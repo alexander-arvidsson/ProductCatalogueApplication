@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using ProductCatalogueApplication.Data.Interfaces;
+
 
 namespace ProductCatalogueApplication.Data
 {
@@ -30,6 +30,7 @@ namespace ProductCatalogueApplication.Data
         public void AddCustomer(Customer customer)
         {
             _context.Add(customer);
+            _context.SaveChanges();
         }
 
         public void RemoveCustomer(Customer customer)
