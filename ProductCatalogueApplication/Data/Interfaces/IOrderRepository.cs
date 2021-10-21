@@ -14,10 +14,17 @@ namespace ProductCatalogueApplication.Data.Interfaces
         public void AddNewOrder(Order newOrder)
         {
         }
+        public void AddNewOrderLine(OrderLine newOrderLine)
+        {
+        }
 
         //en metod för att hämta alla Orders som finns i databasen
-        
+
         public Task<List<Order>> GetOrdersAsync()
+        {
+            throw new Exception();
+        }
+        public async Task<List<OrderLine>> GetOrderLinesAsync()
         {
             throw new Exception();
         }

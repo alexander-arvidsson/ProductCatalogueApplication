@@ -15,8 +15,8 @@ namespace ProductCatalogueApplication.Data
         private Order _order;
         private int _quantity;
 
-        [Required]
-        [Range(1, int.MaxValue)]
+        //[Required]
+        //[Range(1, int.MaxValue)]
         public int Id
         {
             get { return _id; }
@@ -30,21 +30,21 @@ namespace ProductCatalogueApplication.Data
             set { _productid = value; }
         }
 
-        [Required]
+        //[Required]
         public Product Product
         {
             get { return _product; }
             set { _product = value; }
         }
 
-        [Required]
+        //[Required]
         public int OrderId
         {
             get { return _orderid; }
             set { _orderid = value; }
         }
 
-        [Required]
+        //[Required]
         public Order Order
         {
             get { return _order; }

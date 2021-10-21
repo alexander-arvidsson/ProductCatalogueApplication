@@ -19,8 +19,8 @@ namespace ProductCatalogueApplication.Data
             Items = new List<OrderLine>();
         }
 
-        [Required]
-        [Range(1, int.MaxValue)]
+        //[Required]
+        //[Range(1, int.MaxValue)]
         public int Id
         {
             get { return _id; }
@@ -35,7 +35,7 @@ namespace ProductCatalogueApplication.Data
             set { _customerId = value; }
         }
 
-        [Required]
+        //[Required]
         public Customer Customer
         {
             get { return _customer; }

@@ -52,18 +52,18 @@ Lägg en ny order
         </div>
         <div class="form-group">
             <label for="date"> Order Date </label>
-            <input @bind-value="@newOrder.OrderDate" type="datetime" /> 
+            <input @bind-value="@newOrder.OrderDate" type="datetime" />
 
         </div>
         <div class="form-group">
             <label for="customerId"> Customer Id </label>
-            <input @bind-value="@newOrder.CustomerId" type="number" /> 
+            <input @bind-value="@newOrder.CustomerId" type="number" />
 
         </div>
-        
 
 
-        <button class="btn btn-info" type="submit"> Add Order </button> 
+
+        <button class="btn btn-info" type="submit"> Add Order </button>
     </EditForm>
 </div>
 
@@ -99,26 +99,66 @@ Lägg en ny order
 
 </div>
 
+Förbered din order
+<h1>OrderLine</h1>
+<div class="container">
+   
+<EditForm Model="@newOrderLine" OnValidSubmit="(() => AddNewOrderLine(newOrderLine))">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="adress"> Order Adress </label>
+        <input @bind-value="@newOrderLine.ProductId" type="text" />
+
+    </div>
+    <div class="form-group">
+        <label for="date"> Order Date </label>
+        <input @bind-value="@newOrderLine.Quantity" type="datetime" />
+
+    </div>
+        
+
+
+    <button class="btn btn-info" type="submit"> Add Order </button>
+</EditForm>
+
+    
+
+</div>
+
+
+
+
 @code{
 
     List<Order> displayOrders;
+    List<OrderLine> prepareOrderLine;
+    List<Order> activeOrders = new List<Order>();
+    //antingen göra en lista med alla produkter som finns som man kan beställa
+    //eller bara ett formulär
+
 
     protected override async Task OnInitializedAsync()
     {
         displayOrders = await orderRepo.GetOrdersAsync();
+        prepareOrderLine = await orderRepo.GetOrderLinesAsync();
+
     }
     Order newOrder = new Order();
+    OrderLine newOrderLine = new OrderLine();
+
     private void AddNewOrder(Order o) // vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
     {
         //en order måste ha en kund, om den inte finns så kan den inte skapas
         orderRepo.AddNewOrder(o);
+        activeOrders.Add(o); //lägger till i denna lista tillfälligt för att göra så att vi kan gå vidare till orderlines
 
     }
 
     private void ShowProducts() // vi vill ge användarna möjlighet att se vilka produkter som finns så att de kan lägga en order
     {
         //implementera en metod från ProductsRepository så att separationen håller
-        //skicka med stocken från en meny 
+        //skicka med stocken från en meny
     }
 
     Order updatedOrder = new Order();
@@ -132,10 +172,15 @@ Lägg en ny order
     private void UpdateOrder(Order order) //får skicka med båda objekten så att vi kan hålla koll på stock osv
     {
         orderRepo.UpdateOrder(order);
-        if(order.PaymentCompleted == false)
-            {
-                //meddela att stock är noll
-            }
+        if (order.PaymentCompleted == false)
+        {
+            //meddela att stock är noll
+        }
+    }
+
+    private void AddNewOrderLine(OrderLine ol)
+    {
+        orderRepo.AddNewOrderLine(ol);
     }
 
 }
