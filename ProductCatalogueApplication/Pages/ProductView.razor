@@ -3,7 +3,16 @@
 @using ProductCatalogueApplication.Data
 @inject IProductRepository productRepo
 
-<h1>Display </h1>
+<h1>Products</h1>
+<hr>
+
+<select type="text" id="products" class="form-control select-picker" @bind="@FilterFunction">
+    <option value="1">All products</option>
+    <option value="2">All products not in stock</option>
+</select>
+<br>
+<button class="btn btn-info" type="button" @onclick="@FilterGUI">Filter</button>
+<p></p>
 <div class="row bg-light">
     <table class="table table-bordered">
         <thead class="thead-dark">
@@ -22,39 +31,6 @@
             {
                 @foreach (var b in displayProducts)
                 {
-            <tr>
-
-                <td>@b.Id</td>
-                <td>@b.Name </td>
-                <td>@b.Price</td>
-                <td>@b.Stock</td>
-                <td>@b.Description</td>
-                <td><button class="btn btn-danger" @onclick="(() => RemoveProduct(b))">Delete</button></td>
-                <td><button class="btn btn-danger" @onclick="(() => SetProductForUpdate(b))">Update</button></td>
-
-            </tr>
-                }
-            }
-        </tbody>
-    </table>
-</div>
-
-<div class="row bg-light">
-    <table class="table table-bordered">
-        <thead class="thead-dark">
-            <tr>
-                <th>Product ID</th>
-                <th>Product Name</th>
-                <th>Product Price</th>
-                <th>Product Stock</th>
-                <th>Product Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (displayZeroStockProducts.Any())
-            {
-                @foreach (var b in displayZeroStockProducts)
-                {
                     <tr>
 
                         <td>@b.Id</td>
@@ -62,6 +38,8 @@
                         <td>@b.Price</td>
                         <td>@b.Stock</td>
                         <td>@b.Description</td>
+                        <td><button class="btn btn-danger" @onclick="(() => RemoveProduct(b))">Delete</button></td>
+                        <td><button class="btn btn-danger" @onclick="(() => SetProductForUpdate(b))">Update</button></td>
 
                     </tr>
                 }
@@ -69,7 +47,7 @@
         </tbody>
     </table>
 </div>
-
+<br>
 <EditForm Model="@newProduct" OnValidSubmit="(() => AddProduct(newProduct))">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -89,13 +67,9 @@
         <label for="stock">Stock</label>
         <input @bind-value="@newProduct.Stock" type="number" />
     </div>
-    <div class="form-group">
-        <label for="restockingdate">Restocking Date</label>
-        <input @bind-value="@newProduct.RestockingDate" type="date" />
-    </div>
     <button class="btn btn-info" type="submit">Add Product</button>
 </EditForm>
-
+<hr>
 <EditForm Model="@updateProduct" OnValidSubmit="(() => UpdateProduct())">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -109,41 +83,37 @@
     </div>
     <div class="form-group">
         <label for="price">Product price</label>
-        <input @bind-value="@updateProduct.Price" type="number" step="0.01"/>
+        <input @bind-value="@updateProduct.Price" type="number" step="0.01" />
     </div>
     <div class="form-group">
         <label for="stock">Stock</label>
         <input @bind-value="@updateProduct.Stock" type="number" />
     </div>
-    <div class="form-group">
-        <label for="restockingdate">Restocking Date</label>
-        <input @bind-value="@updateProduct.RestockingDate" type="date" />
-    </div>
     <button class="btn btn-info" type="submit">Update Product</button>
 </EditForm>
-
+<hr>
 
 
 @code{
     List<Product> displayProducts;
-    List<Product> displayZeroStockProducts;
 
     protected override async Task OnInitializedAsync()
     {
         displayProducts = await productRepo.GetProductsAsync();
-        displayZeroStockProducts = await productRepo.DisplayZeroStockAsync();
     }
 
     Product newProduct = new Product();
-    private void AddProduct(Product p)
+    private async void AddProduct(Product p)
     {
-        productRepo.AddProductAsync(newProduct);
+        productRepo.AddProduct(newProduct);
         newProduct = new Product();
+        displayProducts = await productRepo.GetProductsAsync();
     }
 
-    private void RemoveProduct(Product p)
+    private async void RemoveProduct(Product p)
     {
-        productRepo.RemoveProductAsync(p);
+        productRepo.RemoveProduct(p);
+        displayProducts = await productRepo.GetProductsAsync();
     }
 
     Product updateProduct = new Product();
@@ -154,6 +124,23 @@
 
     private void UpdateProduct()
     {
-        productRepo.UpdateProductAsync(updateProduct);
+        productRepo.UpdateProduct(updateProduct);
+    }
+
+    public string FilterFunction { get; set; }
+    private async void FilterGUI()
+    {
+        switch (FilterFunction)
+        {
+            case "1":
+                displayProducts = await productRepo.GetProductsAsync();
+                break;
+            case "2":
+                displayProducts = await productRepo.DisplayZeroStockAsync();
+                break;
+            default:
+                displayProducts = await productRepo.GetProductsAsync();
+                break;
+        }
     }
 }

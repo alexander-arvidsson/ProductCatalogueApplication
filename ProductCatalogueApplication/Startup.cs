@@ -12,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ProductCatalogueApplication.Data.Interfaces;
 
 
 namespace ProductCatalogueApplication
@@ -35,7 +34,6 @@ namespace ProductCatalogueApplication
             services.AddSingleton<WeatherForecastService>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
-            services.AddScoped<OrderLineRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
 
             services.AddDbContext<WarehouseAutomationContext>(opts =>
