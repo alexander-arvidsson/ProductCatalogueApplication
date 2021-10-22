@@ -38,8 +38,8 @@
                         <td>@b.Price</td>
                         <td>@b.Stock</td>
                         <td>@b.Description</td>
-                        <td><button class="btn btn-danger" @onclick="(() => RemoveProduct(b))">Delete</button></td>
-                        <td><button class="btn btn-danger" @onclick="(() => SetProductForUpdate(b))">Update</button></td>
+                        <td><button class="btn btn-danger" @onclick="(() => RemoveProduct(b))">Remove</button></td>
+                        <td><button class="btn btn-outline-info" @onclick="(() => SetProductForUpdate(b))">Update</button></td>
 
                     </tr>
                 }
