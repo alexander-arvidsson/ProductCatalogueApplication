@@ -14,17 +14,24 @@ namespace ProductCatalogueApplication.Data.Interfaces
         public void AddNewOrder(Order newOrder)
         {
         }
+        public void AddNewOrderLine(OrderLine newOrderLine, Order matchingOrder)
+        {
+        }
 
         //en metod för att hämta alla Orders som finns i databasen
-        
+
         public Task<List<Order>> GetOrdersAsync()
+        {
+            throw new Exception();
+        }
+        public async Task<List<OrderLine>> GetOrderLinesAsync()
         {
             throw new Exception();
         }
 
         //en metod för att uppdatera en existerande order
 
-        public void UpdateOrder(Order toBeUpdated, Product product) //check att den stock och att den har payment completed om båda är sanna så blir det dispatched, om det inte är sant så blir den pending
+        public void UpdateOrder(Order toBeUpdated) //check att den stock och att den har payment completed om båda är sanna så blir det dispatched, om det inte är sant så blir den pending
         {
 
         }

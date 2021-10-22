@@ -103,17 +103,18 @@
     }
 
     Product newProduct = new Product();
-    private async void AddProduct(Product p)
+    private async Task AddProduct(Product p)
     {
-        productRepo.AddProduct(newProduct);
+        await productRepo.AddProduct(newProduct);
+        displayProducts.Add(newProduct);
         newProduct = new Product();
-        displayProducts = await productRepo.GetProductsAsync();
+
     }
 
-    private async void RemoveProduct(Product p)
+    private async Task RemoveProduct(Product p)
     {
-        productRepo.RemoveProduct(p);
-        displayProducts = await productRepo.GetProductsAsync();
+        await productRepo.RemoveProduct(p);
+        displayProducts.Remove(p);
     }
 
     Product updateProduct = new Product();
@@ -122,13 +123,13 @@
         updateProduct = selected;
     }
 
-    private void UpdateProduct()
+    private async Task UpdateProduct()
     {
-        productRepo.UpdateProduct(updateProduct);
+        await productRepo.UpdateProduct(updateProduct);
     }
 
     public string FilterFunction { get; set; }
-    private async void FilterGUI()
+    private async Task FilterGUI()
     {
         switch (FilterFunction)
         {
