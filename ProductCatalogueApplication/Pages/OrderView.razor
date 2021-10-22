@@ -1,9 +1,11 @@
 ﻿@page "/orders"
 @using ProductCatalogueApplication.Data
 @using ProductCatalogueApplication.Data.Interfaces
+
 @inject IOrderRepository orderRepo
 
-<h1>Display </h1>
+
+<h1 class="alert-light">Existerande ordrar </h1>
 <div class="row bg-light">
     <table class="table table-bordered">
         <thead class="thead-dark">
@@ -14,6 +16,8 @@
                 <th>Dispatched</th>
                 <th>Order Date</th>
                 <th>Payment Completed</th>
+                <th class="bg-success">Update</th>
+
             </tr>
         </thead>
         <tbody>
@@ -21,80 +25,152 @@
             {
                 @foreach (var b in displayOrders)
                 {
-                    <tr>
+            <tr>
 
-                        <td>@b.Id</td>
-                        <td>@b.CustomerId</td>
-                        <td>@b.DeliveryAdress </td>
-                        <td>@b.Dispatched</td>
-                        <td>@b.OrderDate</td>
-                        <td>@b.PaymentCompleted</td>
-                    </tr>
+                <td>@b.Id</td>
+                <td>@b.CustomerId</td>
+                <td>@b.DeliveryAdress </td>
+                <td>@b.Dispatched</td>
+                <td>@b.OrderDate</td>
+                <td>@b.PaymentCompleted</td>
+                <td>
+                    <button class="btn btn-outline-success" type="button" @onclick="(() => UpdateOrder(b))"> Update </button>
+                </td>
+
+            </tr>
                 }
             }
         </tbody>
     </table>
 </div>
 
-<h1>Catalogue service </h1>
+
+
+<h2 class="alert-light">Lägg en ny order och välj sedan vilka items som ska inkluderas </h2>
 <div class="container">
-    <EditForm Model="@newOrder" OnValidSubmit="(() => AddNewOrder(newOrder))">
+    <EditForm Model="@prepNewOrder" OnValidSubmit="(() => PrepareNewOrder(prepNewOrder))">
         <DataAnnotationsValidator />
         <ValidationSummary />
         <div class="form-group">
             <label for="adress"> Order Adress </label>
-            <input @bind-value="@newOrder.DeliveryAdress" type="text" />
+            <input @bind-value="@prepNewOrder.DeliveryAdress" type="text" />
 
         </div>
         <div class="form-group">
             <label for="date"> Order Date </label>
-            <input @bind-value="@newOrder.OrderDate" type="datetime" /> 
+            <input @bind-value="@prepNewOrder.OrderDate" type="datetime" />
 
         </div>
         <div class="form-group">
             <label for="customerId"> Customer Id </label>
-            <input @bind-value="@newOrder.CustomerId" type="number" /> 
+            <input @bind-value="@prepNewOrder.CustomerId" type="number" />
+
         </div>
 
-        <button class="btn btn-info" type="submit"> Add Product </button> 
+
+
+        <button class="btn btn-success" type="submit"> Add Order </button>
     </EditForm>
 </div>
-<div class="container">
-    <EditForm Model="@updatedOrder">
-        
-        <button class="btn btn-info" @onclick="(() => UpdateOrder(updatedOrder, updatedProduct))"> Update Order </button> //skickar objektet newProduct till en metod AddProduct
-    </EditForm>
-</div>
+@if (readyOrderLines)
+{
+    <h2>Välj vilka items som ska inkluderas i ordern </h2>
+    <div class="container">
+        <EditForm Model="@prepNewOrderLine" OnValidSubmit="(() => PrepareNewOrderLine(prepNewOrderLine))">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="date"> ProductId </label>
+                <input @bind-value="@prepNewOrderLine.ProductId" type="datetime" />
+
+            </div>
+            <div class="form-group">
+                <label for="customerId"> Quantity </label>
+                <input @bind-value="@prepNewOrderLine.Quantity" type="number" />
+
+            </div>
+
+
+
+            <button class="btn btn-outline-secondary" type="submit"> Add item to your current order </button>
+        </EditForm>
+    </div>
+
+}
+else
+{
+    <p> <em>Skapa en order innan du kan lägga till items</em></p>
+
+}
+
+
+
+
 
 
 @code{
+    Order prepNewOrder = new Order();
+    OrderLine prepNewOrderLine = new OrderLine();
+
+
+
+    bool readyOrderLines = false;
 
     List<Order> displayOrders;
+    List<OrderLine> prepareOrderLine;
+
+
 
     protected override async Task OnInitializedAsync()
     {
         displayOrders = await orderRepo.GetOrdersAsync();
+        prepareOrderLine = await orderRepo.GetOrderLinesAsync();
+
     }
 
-    Order newOrder = new Order();
-    private void AddNewOrder(Order o) // vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
+
+
+    private void PrepareNewOrderLine(OrderLine addOrderLine) //////////////
     {
+        //gör en metod där jag gör en orderlist som är kopplad mot det tidigare prepOrder objektet
+
+        orderRepo.AddNewOrderLine(addOrderLine, prepNewOrder);
+    }
+    private void AddNewOrder(Order o) /////////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
+    {
+        //en order måste ha en kund, om den inte finns så kan den inte skapas
         orderRepo.AddNewOrder(o);
 
     }
-
-    private void ShowProducts() // vi vill ge användarna möjlighet att se vilka produkter som finns så att de kan lägga en order
+    private void PrepareNewOrder(Order prepareForOrder) //////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
     {
-        //implementera en metod från ProductsRepository så att separationen håller
-        //skicka med stocken från en meny 
+        //en order måste ha en kund, om den inte finns så kan den inte skapas
+        //placeOrder = true;
+        readyOrderLines = true;
+
+        orderRepo.AddNewOrder(prepareForOrder); //lägger till okbjektet
+                                                //activeOrders.Add(o); //lägger till i denna lista tillfälligt för att göra så att vi kan gå vidare till orderlines
+
     }
+
+
+
+
+    //uppdateringsfunktinoalitet för ordrar
 
     Order updatedOrder = new Order();
-    Product updatedProduct = new Product();
+    //Product updatedProduct = new Product();
 
-    private void UpdateOrder( Order order, Product product) //får skicka med båda objekten så att vi kan hålla koll på stock osv
+    
+
+    private void UpdateOrder(Order order) //får skicka med båda objekten så att vi kan hålla koll på stock osv
     {
-        orderRepo.UpdateOrder(order, product);
+        orderRepo.UpdateOrder(order);
+        
     }
+
+
+
+
 
 }
