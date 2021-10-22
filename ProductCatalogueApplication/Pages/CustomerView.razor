@@ -165,7 +165,7 @@
     {
         await customerRepo.AddCustomer(newCustomer);
         displayCustomers.Add(customer);
-        //newCustomer = new Customer();
+        newCustomer = new Customer();
     }
 
     private async Task RemoveCustomer(Customer customer)
@@ -174,9 +174,9 @@
         displayCustomers.Remove(customer);
     }
 
-    private void UpdateCustomer(Customer customer)
+    private async Task UpdateCustomer(Customer customer)
     {
-        customerRepo.UpdateCustomer(customer);
+        await customerRepo.UpdateCustomer(customer);
         IsUpdating = false;
     }
 

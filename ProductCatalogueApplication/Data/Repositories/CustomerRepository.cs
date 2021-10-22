@@ -38,10 +38,10 @@ namespace ProductCatalogueApplication.Data
             await _context.SaveChangesAsync();
         }
 
-        public void UpdateCustomer(Customer customer)
+        public async Task UpdateCustomer(Customer customer)
         {
             _context.Update(customer);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
     }

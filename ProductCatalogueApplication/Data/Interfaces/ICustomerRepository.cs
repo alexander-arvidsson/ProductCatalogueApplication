@@ -9,7 +9,7 @@ namespace ProductCatalogueApplication.Data.Interfaces
     {
         Task AddCustomer(Customer customer);
         Task RemoveCustomer(Customer customer);
-        void UpdateCustomer(Customer customer);
+        Task UpdateCustomer(Customer customer);
         Task<List<Customer>> GetCustomersAsync();
     }
 }
