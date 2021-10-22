@@ -24,6 +24,12 @@ namespace ProductCatalogueApplication.Data
         {
             return await _context.Orders.ToListAsync();
         }
+
+        public async Task<List<Order>> GetOrdersAsync(int id)
+        {
+            return await _context.Orders.Where(c => c.CustomerId == id).ToListAsync();
+        }
+
         public async Task<List<OrderLine>> GetOrderLinesAsync()
         {
             return await _context.OrderLines.ToListAsync();
@@ -81,6 +87,16 @@ namespace ProductCatalogueApplication.Data
             }
             _context.SaveChanges();
             
+        }
+
+        public async Task<List<Order>> DisplayArchivedCustomerOrder(Customer customer)
+        {
+            return await _context.Orders.Where(o => o.Dispatched == true && customer.Id == o.CustomerId).ToListAsync();
+        }
+
+        public async Task<List<Order>> DisplayActiveCustomerOrder(Customer customer)
+        {
+            return await _context.Orders.Where(o => o.Dispatched == false && customer.Id == o.CustomerId).ToListAsync();
         }
     }
 }
