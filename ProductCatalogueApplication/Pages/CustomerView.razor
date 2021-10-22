@@ -49,11 +49,11 @@
     <h1>Orders </h1>
     @if (customerOrders.Any())
     {
-<select type="text" id="products" class="form-control select-picker" @bind="@FilterFunction">
-    <option value="1">All orders</option>
-    <option value="2">All archived orders</option>
-    <option value="3">All active orders</option>
-</select>
+        <select type="text" id="products" class="form-control select-picker" @bind="@FilterFunction">
+            <option value="1">All orders</option>
+            <option value="2">All archived orders</option>
+            <option value="3">All active orders</option>
+        </select>
         <button class="btn btn-info" type="button" @onclick="(() => FilterGUI(selectedCustomer))">Filter</button>
         <p></p>
         <div class="row bg-light">
@@ -93,8 +93,9 @@
 }
 
 
-@if (IsInspecting == false)
+@if (IsInspecting == false && IsUpdating != true)
 {
+    <h3>Add a customer</h3>
     <EditForm Model="@newCustomer" OnValidSubmit="(() => AddCustomer(newCustomer))">
         <DataAnnotationsValidator />
         <ValidationSummary />
@@ -118,6 +119,7 @@
 
 @if (IsUpdating == true)
 {
+    <h3>Update a customer</h3>
     <EditForm Model="@updateCustomer" OnValidSubmit="(() => UpdateCustomer(updateCustomer))">
         <DataAnnotationsValidator />
         <ValidationSummary />
@@ -185,6 +187,7 @@
     {
         List<Order> getOrders = new List<Order>();
         IsInspecting = true;
+        IsUpdating = false;
         selectedCustomer = customer;
 
         displayCustomers = displayCustomers.Where(c => c.Id == customer.Id).ToList();
@@ -206,7 +209,7 @@
                 customerOrders = await orderRepo.DisplayActiveCustomerOrder(c);
                 break;
             default:
-                customerOrders =  await orderRepo.GetOrdersAsync(c.Id);
+                customerOrders = await orderRepo.GetOrdersAsync(c.Id);
                 break;
         }
     }
