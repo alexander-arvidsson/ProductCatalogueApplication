@@ -44,14 +44,5 @@ namespace ProductCatalogueApplication.Data
             _context.SaveChanges();
         }
 
-        public async Task<List<Order>> DisplayArchivedCustomerOrder(Customer customer)
-        {
-            return await _context.Orders.Where(o => o.Dispatched == true && customer.Id == o.CustomerId).ToListAsync();
-        }
-
-        public async Task<List<Order>> DisplayActiveCustomerOrder(Customer customer)
-        {
-            return await _context.Orders.Where(o => o.Dispatched == false && customer.Id == o.CustomerId).ToListAsync();
-        }
     }
 }
