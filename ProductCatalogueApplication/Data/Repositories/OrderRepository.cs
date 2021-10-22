@@ -81,6 +81,7 @@ namespace ProductCatalogueApplication.Data
                 {
                     
                     toBeUpdated.Dispatched = false; //den blir annars pending om den inte ?r betald
+                    checkPro.RestockingDate = DateTime.Now.AddDays(10);
 
                 }
             }
