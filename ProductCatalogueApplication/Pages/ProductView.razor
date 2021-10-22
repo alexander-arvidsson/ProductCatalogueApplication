@@ -48,54 +48,61 @@
     </table>
 </div>
 <br>
-<EditForm Model="@newProduct" OnValidSubmit="(() => AddProduct(newProduct))">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="form-group">
-        <label for="name">Product name</label>
-        <input @bind-value="@newProduct.Name" type="text" />
-    </div>
-    <div class="form-group">
-        <label for="description">Description</label>
-        <input @bind-value="@newProduct.Description" type="text" />
-    </div>
-    <div class="form-group">
-        <label for="price">Product price</label>
-        <input @bind-value="@newProduct.Price" type="number" step="0.01" />
-    </div>
-    <div class="form-group">
-        <label for="stock">Stock</label>
-        <input @bind-value="@newProduct.Stock" type="number" />
-    </div>
-    <button class="btn btn-info" type="submit">Add Product</button>
-</EditForm>
-<hr>
-<EditForm Model="@updateProduct" OnValidSubmit="(() => UpdateProduct())">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="form-group">
-        <label for="name">Product name</label>
-        <input @bind-value="@updateProduct.Name" type="text" />
-    </div>
-    <div class="form-group">
-        <label for="description">Description</label>
-        <input @bind-value="@updateProduct.Description" type="text" />
-    </div>
-    <div class="form-group">
-        <label for="price">Product price</label>
-        <input @bind-value="@updateProduct.Price" type="number" step="0.01" />
-    </div>
-    <div class="form-group">
-        <label for="stock">Stock</label>
-        <input @bind-value="@updateProduct.Stock" type="number" />
-    </div>
-    <button class="btn btn-info" type="submit">Update Product</button>
-</EditForm>
-<hr>
+@if (toUpdate == true)
+{
+    <h3>Update a product</h3>
+    <EditForm Model="@updateProduct" OnValidSubmit="(() => UpdateProduct())">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="name">Product name</label>
+            <input @bind-value="@updateProduct.Name" type="text" />
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <input @bind-value="@updateProduct.Description" type="text" />
+        </div>
+        <div class="form-group">
+            <label for="price">Product price</label>
+            <input @bind-value="@updateProduct.Price" type="number" step="0.01" />
+        </div>
+        <div class="form-group">
+            <label for="stock">Stock</label>
+            <input @bind-value="@updateProduct.Stock" type="number" />
+        </div>
+        <button class="btn btn-info" type="submit">Update Product</button>
+    </EditForm>
+}
+else
+{
+    <h3>Add a product</h3>
+    <EditForm Model="@newProduct" OnValidSubmit="(() => AddProduct(newProduct))">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="name">Product name</label>
+            <input @bind-value="@newProduct.Name" type="text" />
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <input @bind-value="@newProduct.Description" type="text" />
+        </div>
+        <div class="form-group">
+            <label for="price">Product price</label>
+            <input @bind-value="@newProduct.Price" type="number" step="0.01" />
+        </div>
+        <div class="form-group">
+            <label for="stock">Stock</label>
+            <input @bind-value="@newProduct.Stock" type="number" />
+        </div>
+        <button class="btn btn-info" type="submit">Add Product</button>
+    </EditForm>
+}
 
 
 @code{
     List<Product> displayProducts;
+    bool toUpdate = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -121,11 +128,13 @@
     private void SetProductForUpdate(Product selected)
     {
         updateProduct = selected;
+        toUpdate = true;
     }
 
     private async Task UpdateProduct()
     {
         await productRepo.UpdateProduct(updateProduct);
+        toUpdate = false;
     }
 
     public string FilterFunction { get; set; }
