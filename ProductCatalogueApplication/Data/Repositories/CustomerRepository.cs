@@ -19,39 +19,30 @@ namespace ProductCatalogueApplication.Data
             _context = context;
         }
 
-        //H?r kan vi lägga in metoder som rör Customer, bara för start en metod för att hämta alla customers som finns lagrade 
+        //H?r kan vi l?gga in metoder som r?r Customer, bara f?r start en metod f?r att h?mta alla customers som finns lagrade 
         public async Task<List<Customer>> GetCustomersAsync()
         {
             return await _context.Customers.ToListAsync();
         }
 
         //Customer Add metod
-        public void AddCustomer(Customer customer)
+        public async Task AddCustomer(Customer customer)
         {
             _context.Add(customer);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void RemoveCustomer(Customer customer)
+        public async Task RemoveCustomer(Customer customer)
         {
             _context.Remove(customer);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void UpdateCustomer(Customer customer)
+        public async Task UpdateCustomer(Customer customer)
         {
             _context.Update(customer);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<List<Order>> DisplayArchivedCustomerOrder(Customer customer)
-        {
-            return await _context.Orders.Where(o => o.Dispatched == true && customer.Id == o.CustomerId).ToListAsync();
-        }
-
-        public async Task<List<Order>> DisplayActiveCustomerOrder(Customer customer)
-        {
-            return await _context.Orders.Where(o => o.Dispatched == false && customer.Id == o.CustomerId).ToListAsync();
-        }
     }
 }

@@ -7,11 +7,9 @@ namespace ProductCatalogueApplication.Data.Interfaces
 {
     interface ICustomerRepository
     {
-        void AddCustomer(Customer customer);
-        void RemoveCustomer(Customer customer);
-        void UpdateCustomer(Customer customer);
-        public Task<List<Order>> DisplayArchivedCustomerOrder(Customer customer);
-        public Task<List<Order>> DisplayActiveCustomerOrder(Customer customer);
-        public Task<List<Customer>> GetCustomersAsync();
+        Task AddCustomer(Customer customer);
+        Task RemoveCustomer(Customer customer);
+        Task UpdateCustomer(Customer customer);
+        Task<List<Customer>> GetCustomersAsync();
     }
 }
