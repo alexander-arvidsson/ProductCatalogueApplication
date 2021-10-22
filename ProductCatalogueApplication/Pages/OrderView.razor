@@ -25,23 +25,24 @@
             {
                 @foreach (var b in displayOrders)
                 {
-            <tr>
+                    <tr>
 
-                <td>@b.Id</td>
-                <td>@b.CustomerId</td>
-                <td>@b.DeliveryAdress </td>
-                <td>@b.Dispatched</td>
-                <td>@b.OrderDate</td>
-                <td>@b.PaymentCompleted</td>
-                <td>
-                    <button class="btn btn-outline-success" type="button" @onclick="(() => UpdateOrder(b))"> Update </button>
-                </td>
+                        <td>@b.Id</td>
+                        <td>@b.CustomerId</td>
+                        <td>@b.DeliveryAdress </td>
+                        <td>@b.Dispatched</td>
+                        <td>@b.OrderDate</td>
+                        <td>@b.PaymentCompleted</td>
+                        <td>
+                        </td>
 
-            </tr>
+                    </tr>
                 }
             }
         </tbody>
     </table>
+    <button class="btn btn-outline-success" type="button" @onclick="(() => UpdateOrder(displayOrders))"> Process Batchorders </button>
+
 </div>
 
 
@@ -54,11 +55,6 @@
         <div class="form-group">
             <label for="adress"> Order Adress </label>
             <input @bind-value="@prepNewOrder.DeliveryAdress" type="text" />
-
-        </div>
-        <div class="form-group">
-            <label for="date"> Order Date </label>
-            <input @bind-value="@prepNewOrder.OrderDate" type="datetime" />
 
         </div>
         <div class="form-group">
@@ -163,9 +159,9 @@ else
 
     
 
-    private void UpdateOrder(Order order) //får skicka med båda objekten så att vi kan hålla koll på stock osv
+    private void UpdateOrder(List<Order> allOrders) //får skicka med båda objekten så att vi kan hålla koll på stock osv
     {
-        orderRepo.UpdateOrder(order);
+        orderRepo.UpdateOrder(allOrders);
         
     }
 

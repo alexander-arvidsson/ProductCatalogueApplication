@@ -42,7 +42,7 @@ namespace ProductCatalogueApplication.Data
             set { _customer = value; }
         }
 
-        [Required]
+        //[Required]
         public DateTime OrderDate
         {
             get { return _orderDate; }

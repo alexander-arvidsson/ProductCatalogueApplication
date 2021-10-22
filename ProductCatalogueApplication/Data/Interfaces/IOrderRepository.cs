@@ -31,11 +31,14 @@ namespace ProductCatalogueApplication.Data.Interfaces
 
         //en metod för att uppdatera en existerande order
 
-        public void UpdateOrder(Order toBeUpdated) //check att den stock och att den har payment completed om båda är sanna så blir det dispatched, om det inte är sant så blir den pending
+        public void UpdateOrder(List<Order> allOrders) //check att den stock och att den har payment completed om båda är sanna så blir det dispatched, om det inte är sant så blir den pending
         {
 
         }
+        public void AddMoreStock( Product giveProStock, int neededStock)
+        {
 
+        }
         //Visa dispatched och pending orders separat (ska finnas mer info kring när saker kan skeppas osv)
 
         public List<Order> GetDispatchedAndPending(bool dispatched, bool paymentCompleted, int stock)
