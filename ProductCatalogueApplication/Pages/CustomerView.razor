@@ -156,23 +156,27 @@
         IsInspecting = false;
     }
 
-    //Lägg till en metod som sparar i databasen!
+    //0. Lägg till en metod som sparar i databasen!
+    //1. Gör alla metoder till async eftersom det används mer i arbetslivet...
+    //2. Lägg till dispatched/not dispatched list-metod
 
-    private void AddCustomer(Customer customer)
+   
+    private async Task AddCustomer(Customer customer)
     {
-        customerRepo.AddCustomer(newCustomer);
+        await customerRepo.AddCustomer(newCustomer);
         displayCustomers.Add(customer);
+        newCustomer = new Customer();
     }
 
-    private void RemoveCustomer(Customer customer)
+    private async Task RemoveCustomer(Customer customer)
     {
-        customerRepo.RemoveCustomer(customer);
+        await customerRepo.RemoveCustomer(customer);
         displayCustomers.Remove(customer);
     }
 
-    private void UpdateCustomer(Customer customer)
+    private async Task UpdateCustomer(Customer customer)
     {
-        customerRepo.UpdateCustomer(customer);
+        await customerRepo.UpdateCustomer(customer);
         IsUpdating = false;
     }
 
