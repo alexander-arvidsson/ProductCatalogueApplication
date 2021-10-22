@@ -53,8 +53,5 @@ namespace ProductCatalogueApplication.Data
         {
             return await _context.Orders.Where(o => o.Dispatched == false && customer.Id == o.CustomerId).ToListAsync();
         }
-
-
-
     }
 }

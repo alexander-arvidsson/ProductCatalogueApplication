@@ -24,20 +24,20 @@ namespace ProductCatalogueApplication.Data
         {
             return await _context.Products.ToListAsync();
         }
-        public void AddProduct(Product p)
+        public async Task AddProduct(Product p)
         {
             _context.Products.Add(p);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
-        public void RemoveProduct(Product p)
+        public async Task RemoveProduct(Product p)
         {
             _context.Products.Remove(p);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
-        public void UpdateProduct(Product p)
+        public async Task UpdateProduct(Product p)
         {
             _context.Products.Update(p);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
         public async Task<List<Product>> DisplayZeroStockAsync()
         {
