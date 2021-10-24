@@ -4,6 +4,10 @@
 
 @inject IOrderRepository orderRepo
 
+@inject ICustomerRepository customerRepo
+
+@inject IProductRepository productRepo
+
 
 <h1 class="alert-light">Existerande ordrar </h1>
 <div class="row bg-light">
@@ -16,6 +20,8 @@
                 <th>Dispatched</th>
                 <th>Order Date</th>
                 <th>Payment Completed</th>
+                <th>Nr of items</th>
+
                 <th class="bg-success">Update</th>
 
             </tr>
@@ -25,27 +31,59 @@
             {
                 @foreach (var b in displayOrders)
                 {
-                    <tr>
+            <tr>
 
-                        <td>@b.Id</td>
-                        <td>@b.CustomerId</td>
-                        <td>@b.DeliveryAdress </td>
-                        <td>@b.Dispatched</td>
-                        <td>@b.OrderDate</td>
-                        <td>@b.PaymentCompleted</td>
-                        <td>
-                        </td>
+                <td>@b.Id</td>
+                <td>@b.CustomerId</td>
+                <td>@b.DeliveryAdress </td>
+                <td>@b.Dispatched</td>
+                <td>@b.OrderDate</td>
+                <td>@b.PaymentCompleted</td>
+                
+                <td>
+                    <button class="btn btn-outline-info" type="button" @onclick="(() => SeeItemsInOrder(b))"> See @b.Items.Count() items </button>
+                </td>
+                <td>
+                    <button class="btn btn-outline-success" type="button" @onclick="(() => SetForUpdate(b))"> Uppdatera Orderinfo </button>
 
-                    </tr>
+                    <button type="button" @onclick="() => SetPayment(true, b)" class="btn btn-danger">Not Payed</button>
+                    <button type="button" @onclick="() => SetPayment(false, b)" class="btn btn-success">Payed</button>
+                </td>
+
+            </tr>
                 }
             }
         </tbody>
     </table>
-    <button class="btn btn-outline-success" type="button" @onclick="(() => UpdateOrder(displayOrders))"> Process Batchorders </button>
+    <button class="btn btn-outline-success" type="button" @onclick="(() => ProcessBatchorders(displayOrders))"> Process Batchorders </button>
+    <button class="btn btn-outline-dark" type="button" @onclick="(() => GetDispatchedOrdersOnly())"> Show Dispatched Orders </button>
+    <button class="btn btn-outline-dark" type="button" @onclick="(() => GetPendingOrdersOnly())"> Show Pending Orders </button>
+
 
 </div>
 
+@if (IsUpdating == true)
+{
+    <EditForm Model="@updatedOrder" OnValidSubmit="(() => UpdateOrder())">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
+        <div class="form-group">
+            <label for="customerId">Customer Id</label>
+            <input @bind-value="@updatedOrder.CustomerId" type="number" />
+        </div>
+        <div class="form-group">
+            <label for="adress">Order Adress</label>
+            <input @bind-value="@updatedOrder.DeliveryAdress" type="text" />
+        </div>
+
+
+
+
+
+        <button class="btn btn-info" type="submit">Update Order</button>
+    </EditForm>
+}
 
 <h2 class="alert-light">Lägg en ny order och välj sedan vilka items som ska inkluderas </h2>
 <div class="container">
@@ -57,17 +95,30 @@
             <input @bind-value="@prepNewOrder.DeliveryAdress" type="text" />
 
         </div>
-        <div class="form-group">
-            <label for="customerId"> Customer Id </label>
-            <input @bind-value="@prepNewOrder.CustomerId" type="number" />
 
-        </div>
+        <InputSelect id="customer" @bind-Value="@prepNewOrder.CustomerId">
+            @foreach (Customer cust in displayCustomers)
+            {
+                <option value="@prepNewOrder.CustomerId"> @cust.Name {@cust.Id} </option>
+            }
+
+        </InputSelect>
+
+        @*/
+            <div class="form-group">
+                <label for="customerId"> Customer Id </label>
+                <input @bind-value="@prepNewOrder.CustomerId" type="number" />
+
+            </div>
+        *@
 
 
 
         <button class="btn btn-success" type="submit"> Add Order </button>
     </EditForm>
 </div>
+
+
 @if (readyOrderLines)
 {
     <h2>Välj vilka items som ska inkluderas i ordern </h2>
@@ -89,6 +140,8 @@
 
 
             <button class="btn btn-outline-secondary" type="submit"> Add item to your current order </button>
+            <button class="btn btn-warning" @onclick="() => DoneAddingItems()"> Done adding items? </button>
+
         </EditForm>
     </div>
 
@@ -100,27 +153,166 @@ else
 }
 
 
+@if (seeItemsInOrder == true)
+{
+    <h1 class="alert-light">Items inuti den valda ordern </h1>
+    <div class="row bg-light">
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Orderline ID</th>
+                    <th>Product ID</th>
+                    <th>Product Name</th>
+                    <th>Product Price</th>
+                    <th>Quantity</th>
+
+
+                </tr>
+            </thead>
+            <tbody>
+                @if (seeMyItemsSpec != null)
+                {
+                    @foreach (OrderLine b in seeMyItemsSpec)
+                    {
+                        <tr>
+
+                            <td>@b.Id</td>
+                            <td>@b.ProductId</td>
+                            <td>@b.Product.Name</td>
+                            <td>@b.Product.Price</td>
+                            <td>@b.Quantity </td>
+
+
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+}
+
+@if (dispatched == true)
+{
+    <h1 class="alert-light">Filtrerade ordrar </h1>
+    <div class="row bg-light">
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer ID</th>
+                    <th>Delivery Adress</th>
+                    <th>Dispatched</th>
+                    <th>Order Date</th>
+                    <th>Payment Completed</th>
+                    <th>Nr of items</th>
 
 
 
+                </tr>
+            </thead>
+            <tbody>
+                @if (onlyDispatchedOrders != null)
+                {
+                    @foreach (Order b in onlyDispatchedOrders)
+                    {
+                        <tr>
 
+                            <td>@b.Id</td>
+                            <td>@b.CustomerId</td>
+                            <td>@b.DeliveryAdress </td>
+                            <td>@b.Dispatched</td>
+                            <td>@b.OrderDate</td>
+                            <td>@b.PaymentCompleted</td>
+                            <td>@b.Items.Count()</td>
+
+
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+}
+@if (pending == true)
+{
+    <h1 class="alert-light">Filtrerade ordrar </h1>
+    <div class="row bg-light">
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer ID</th>
+                    <th>Delivery Adress</th>
+                    <th>Dispatched</th>
+                    <th>Order Date</th>
+                    <th>Payment Completed</th>
+                    <th>Nr of items</th>
+
+
+
+                </tr>
+            </thead>
+            <tbody>
+                @if (onlyPendingOrders != null)
+                {
+                    @foreach (Order b in onlyPendingOrders)
+                    {
+                        <tr>
+
+                            <td>@b.Id</td>
+                            <td>@b.CustomerId</td>
+                            <td>@b.DeliveryAdress </td>
+                            <td>@b.Dispatched</td>
+                            <td>@b.OrderDate</td>
+                            <td>@b.PaymentCompleted</td>
+                            <td>@b.Items.Count()</td>
+
+
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+}
 @code{
+    //Order updateOrder = new Order();
+    bool dispatched = false;
+    bool pending = false;
+
+
     Order prepNewOrder = new Order();
     OrderLine prepNewOrderLine = new OrderLine();
 
-
-
+    private bool IsUpdating = false;
+    bool avoidDuplicate = false;
     bool readyOrderLines = false;
+    bool seeItemsInOrder = false;
+    Order seeMyItems;
+    List<OrderLine> seeMyItemsSpec;
+
+    List<Customer> displayCustomers;
+    List<Product> displayProducts;
 
     List<Order> displayOrders;
     List<OrderLine> prepareOrderLine;
 
+    List<Order> onlyPendingOrders;
+    List<Order> onlyDispatchedOrders;
 
 
     protected override async Task OnInitializedAsync()
     {
         displayOrders = await orderRepo.GetOrdersAsync();
         prepareOrderLine = await orderRepo.GetOrderLinesAsync();
+        displayCustomers = await customerRepo.GetCustomersAsync();
+        displayProducts = await productRepo.GetProductsAsync();
 
     }
 
@@ -135,9 +327,15 @@ else
     private void AddNewOrder(Order o) /////////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
     {
         //en order måste ha en kund, om den inte finns så kan den inte skapas
-        orderRepo.AddNewOrder(o);
+        //avoid duplicate
+        if (avoidDuplicate == false)
+        {
+            orderRepo.AddNewOrder(o);
+            avoidDuplicate = true;
+        }
 
     }
+
     private void PrepareNewOrder(Order prepareForOrder) //////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
     {
         //en order måste ha en kund, om den inte finns så kan den inte skapas
@@ -157,16 +355,58 @@ else
     Order updatedOrder = new Order();
     //Product updatedProduct = new Product();
 
-    
 
-    private void UpdateOrder(List<Order> allOrders) //får skicka med båda objekten så att vi kan hålla koll på stock osv
+
+    private void ProcessBatchorders(List<Order> allOrders) //får skicka med båda objekten så att vi kan hålla koll på stock osv
     {
-        orderRepo.UpdateOrder(allOrders);
-        
+        dispatched = false;
+        pending = false;
+        orderRepo.ProcessBatchorders(allOrders);
+
+    }
+    private void UpdateOrder() //får skicka med båda objekten så att vi kan hålla koll på stock osv
+    {
+        orderRepo.UpdateOrder(updatedOrder);
+
+    }
+    private void SetForUpdate(Order selectedOrder) //får skicka med båda objekten så att vi kan hålla koll på stock osv
+    {
+        updatedOrder = selectedOrder;
+        IsUpdating = true;
+
     }
 
+    private void SetPayment(bool payedOrNot, Order order)
+    {
+        orderRepo.SetPayment(payedOrNot, order);
+    }
 
+    private void DoneAddingItems()
+    {
+        avoidDuplicate = false;
+        readyOrderLines = false;
+        orderRepo.deleteNoItemsOrders();
+    }
 
+    private void SeeItemsInOrder(Order seeInOrder) //Vi vill se vilka items som finns i en order och produkter kopplade till orderlines
+    {
+        seeItemsInOrder = true;
+        seeMyItems = seeInOrder;
+        seeMyItemsSpec = prepareOrderLine.Where(b => b.Order == seeInOrder).ToList();
+    }
 
+    private void GetDispatchedOrdersOnly()
+    {
+        pending = false;
+        dispatched = true;
+        onlyDispatchedOrders = orderRepo.GetDispatchedAndPending(displayOrders, true);
+    }
+    private void GetPendingOrdersOnly()
+    {
+        dispatched = false;
+        pending = true;
+        onlyPendingOrders = orderRepo.GetDispatchedAndPending(displayOrders, false);
+
+    }
 
 }
