@@ -72,93 +72,110 @@ namespace ProductCatalogueApplication.Data
             //gör en lista som sorterar utefter längst datum
             List<Order> sortedByLongest = allOrders.OrderBy(b => b.OrderDate).ToList(); //vi servar först de som har väntat längst
             bool dispatchWholeOrder = true;
-            
+            List<int> tempStocks = new List<int>();
+
 
             foreach (Order ord in sortedByLongest)
             {
-                //OrderLine checkProduct = _context.OrderLines.Where(ol => ol.OrderId == ord.Id).FirstOrDefault(); //letar efter matchande?keys f?r att tillslut hitta Produkten som ?r kopppad s? vi kan f? stock som ?r en produkt egenksap
 
                 List<OrderLine> checkProducts = _context.OrderLines.Where(ol => ol.OrderId == ord.Id).ToList();
+                tempStocks.Clear();
+                dispatchWholeOrder = true;
 
-                List<int> tempStocks = new List<int>();
-                
-                foreach(OrderLine ordLine in checkProducts) //vi måste få så att if satserna stämmer för varje orderline 
+                if(ord.Dispatched == false) // vi är endast intresserade av ordrar som inte är skickade
                 {
-                    Product checkPro = _context.Products.Where(ol => ol.Id == ordLine.ProductId).FirstOrDefault();
-                    Product checkProDummy = checkPro;
-                    int intDummy = checkPro.Stock;
-                    
-
-                    if (ord.Dispatched == false && dispatchWholeOrder != false)
+                    foreach (OrderLine ordLine in checkProducts) //vi kollar varje orderline hos de olika odrarna
                     {
-                        if (intDummy - ordLine.Quantity >= 0 && ord.PaymentCompleted == true) // vi kollar så att stocken räcker för våran dummy och att den är betald för
-                                                                                                         //antingen avn?nds en metod i en annan klass  eller skriv in en egen check
-                        {
+                        Product checkPro = _context.Products.Where(ol => ol.Id == ordLine.ProductId).FirstOrDefault();
+                        
+                        if (checkPro.Stock - ordLine.Quantity >= 0) // vi kollar om stock räcker
 
-                            //checkProDummy.Stock = checkProDummy.Stock - ordLine.Quantity;
-                            intDummy = intDummy - ordLine.Quantity;
+                        {
+                            if (ord.PaymentCompleted == true) //den är betald och stock räcker
+                            {
+                                tempStocks.Add(ordLine.Quantity);                                //vi memorerar hur mycket stock som tas
+                                checkPro.Stock = checkPro.Stock - ordLine.Quantity; //FÖRSTA SCENARIOT DÅ EN ORDERLINE ÄR OK
+                            }
+                            else // det finns stock men ordern är inte betald
+                            {
+                                dispatchWholeOrder = false;
+                                tempStocks.Add(0); //vi memorer att vi inte tar något
+                            }
+                            
                         }
-                        else
+                        else //stock räcker inte så vi kollar på restock date
                         {
-                            //gör en metod som efterfrågar som adderar så mycket som efterfrågas och inte går att förse
-
-                            if (checkPro.RestockingDate.ToString().Equals("0001-01-01 00:00:00"))//betyder att den inte har ett restocking date så sätter ett, vi kan också ha ett gammalt
+                                                        
+                            if (checkPro.RestockingDate.ToString().Equals("0001-01-01 00:00:00")) //betyder att den inte har ett restocking date och vi sätter ett
                             {
                                 checkPro.RestockingDate = DateTime.Now.AddDays(10);
-
-                                dispatchWholeOrder = false;
+                                tempStocks.Add(0); //vi tar då inget stock eftersom det inte finns ett restock date än
+                                dispatchWholeOrder = false; //vi sätter också boolen dispatchWholeOrder till falsk eftersom inte kan skickas
                             }
-
-                            else //betyder att det finns ett så vi kollar om datumet är uppnått eller inte
+                            else //vi har ett restockdate, om det är nu så kan vi restocka, annars väntar vi
                             {
                                 if (DateTime.Now >= checkPro.RestockingDate) //vi har nått Restocking Date och fyller på med så många som behövs samt skickar iväg ordern
                                 {
+
                                     int neededStock = checkPro.Stock - ordLine.Quantity;
                                     neededStock = Math.Abs(neededStock);
-                                    AddMoreStock(checkPro, neededStock);
-                                    checkPro.RestockingDate = DateTime.Parse("0001-01-01 00:00:00"); //när vi kommit fram till restockDate så sätter vi det till standardvärdet igen så vi börjar om
+                                    tempStocks.Add(ordLine.Quantity); //vi memorerar hur mcyket stock som tas, om en produkt blir restocked så tar vi endast quantoity vilket betyder att den kan bli ett överskott 
+                                    AddMoreStock(checkPro, neededStock); //vi addar så mcyket som behövs
+                                    checkPro.Stock = checkPro.Stock - ordLine.Quantity;  //ANDRA SCENARIOT DÅ EN ORDERLINE ÄR OK
 
-                                    if (ord.PaymentCompleted == true)
-                                    {
 
-                                        //checkPro.Stock = checkPro.Stock - ordLine.Quantity;
-                                        //ord.Dispatched = true;
-                                    }
-                                    else
-                                    {
-                                        dispatchWholeOrder = false;
-                                    }
+                                }
+                                else //dagen har inte kommit ännu...
+                                {
+                                    tempStocks.Add(0); //vi tar då inget stock eftersom vi inte har kommit till vårat restock date än
+                                    dispatchWholeOrder = false;//vi har inte nått fram ännu till restock dagen
+
                                 }
                             }
                         }
                     }
-                    if (dispatchWholeOrder == true)
+                }
+                if (dispatchWholeOrder == true && ord.PaymentCompleted == true && ord.Dispatched == false) //ordern är betald och ännu inte skickad samt att bolen inte säger ifrån 
+                {
+                    ord.Dispatched = true;
+
+                }
+                else if (ord.Dispatched == false && dispatchWholeOrder == false)//betyder att en av orderlinsen inte gick att skicka och då  måste vi lämna tillbaka stocks för nästa order
+                {
+                    int counter = 0;
+                    foreach (OrderLine ordLine2 in checkProducts)
                     {
-                        ClearForDispatch(ord, checkProducts);
+                        ordLine2.Product.Stock = ordLine2.Product.Stock + tempStocks[counter]; //vi adderar tillbaka de som tagits ifrån stock eftersom ordern inte gick igenom
+                        counter++;
+                        //Vi vill ge tillbaka stock till de ställen där vi tog stock ifrån                        
+                    }
+                }
+                _context.SaveChanges();     
+            }
+            ResetRestockDays(allOrders); //en metod för att reseta restock days om de är uppnådda efteråt
+
+        }
+        private void ResetRestockDays(List<Order> resetRestockDays)
+        {
+            foreach(Order rest in resetRestockDays)
+            {
+                List<OrderLine> checkProducts = _context.OrderLines.Where(ol => ol.OrderId == rest.Id).ToList();
+                foreach(OrderLine ordLine in checkProducts)
+                {
+                    Product checkPro = _context.Products.Where(ol => ol.Id == ordLine.ProductId).FirstOrDefault();
+
+                    if (DateTime.Now >= checkPro.RestockingDate)
+                    {
+                        checkPro.RestockingDate = DateTime.Parse("0001-01-01 00:00:00"); //när vi kommit fram till restockDate så sätter vi det till standardvärdet igen så vi börjar om
 
                     }
                 }
                 
-
-                _context.SaveChanges();
             }
-            
-            
-            
+            _context.SaveChanges();
 
-            
-            
         }
 
-        private void ClearForDispatch(Order orderToDispatch, List<OrderLine> orderLinesToDispatch)
-        {
-            orderToDispatch.Dispatched = true;
-            foreach(OrderLine ordLine in orderLinesToDispatch)
-            {
-                ordLine.Product.Stock = ordLine.Product.Stock - ordLine.Quantity;
-            }
-
-        }
         public void AddMoreStock(Product giveItMoreStock, int neededStock)
         {
             //Vi har nått dagen då stock kommer in och vi räknar då hur mycket som ska in kanske inte super realistiskt eftersom räkningen borde ske innan men finns ingen sån egenskap i databasen
