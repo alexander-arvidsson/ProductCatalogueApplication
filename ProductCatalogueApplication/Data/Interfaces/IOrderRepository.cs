@@ -24,6 +24,11 @@ namespace ProductCatalogueApplication.Data.Interfaces
         {
             throw new Exception();
         }
+
+        public Task<List<Order>> GetOrdersAsync(int id)
+        {
+            throw new Exception();
+        }
         public async Task<List<OrderLine>> GetOrderLinesAsync()
         {
             throw new Exception();
@@ -62,6 +67,9 @@ namespace ProductCatalogueApplication.Data.Interfaces
         {
 
         }
+
+        Task<List<Order>> DisplayArchivedCustomerOrder(Customer customer);
+        Task<List<Order>> DisplayActiveCustomerOrder(Customer customer);
 
     }
 }
