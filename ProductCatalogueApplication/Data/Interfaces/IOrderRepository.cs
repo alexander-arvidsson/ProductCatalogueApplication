@@ -36,18 +36,35 @@ namespace ProductCatalogueApplication.Data.Interfaces
 
         //en metod för att uppdatera en existerande order
 
-        public void UpdateOrder(Order toBeUpdated) //check att den stock och att den har payment completed om båda är sanna så blir det dispatched, om det inte är sant så blir den pending
+        public void ProcessBatchorders(List<Order> allOrders) //check att den stock och att den har payment completed om båda är sanna så blir det dispatched, om det inte är sant så blir den pending
         {
 
         }
+        public void UpdateOrder(Order specOrder) //check att den stock och att den har payment completed om båda är sanna så blir det dispatched, om det inte är sant så blir den pending
+        {
 
+        }
+        public void AddMoreStock( Product giveProStock, int neededStock)
+        {
+
+        }
         //Visa dispatched och pending orders separat (ska finnas mer info kring när saker kan skeppas osv)
 
-        public List<Order> GetDispatchedAndPending(bool dispatched, bool paymentCompleted, int stock)
+        public List<Order> GetDispatchedAndPending(List<Order> allOrders, bool choice)
         {
+            //dispatched är bara de som är dispatch true och pending är de ordrar till är kopplade till produkter som har restocking date (inte riktigt sant dock eftersom den kan vara en mindre order som räcker med stock)
+            //pending är där paymentCompleted är sant men quantity är mer är stock
             throw new Exception();
-            //kolla så att ett objekt har paymentCompleted till true och att stocken är på 0
-            //eller att dispatched är true
+
+        }
+
+        public void SetPayment(bool payedOrNot, Order order)
+        {
+           
+        }
+
+        public void deleteNoItemsOrders()
+        {
 
         }
 
