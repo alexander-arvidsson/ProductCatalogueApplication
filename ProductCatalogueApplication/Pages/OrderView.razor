@@ -121,7 +121,7 @@
 {
     <h2>Välj vilka items som ska inkluderas i ordern </h2>
     <div class="container">
-        <EditForm Model="@prepNewOrderLine" OnValidSubmit="(() => PrepareNewOrderLine(prepNewOrderLine))">
+        <EditForm Model="@prepNewOrderLine" OnValidSubmit="(() => NewOrderAndOrderLines(prepNewOrder, prepNewOrderLine))">
             <DataAnnotationsValidator />
             <ValidationSummary />
             <label for="product"> Product </label>
@@ -318,6 +318,7 @@ else
     bool avoidDuplicate = false;
     bool readyOrderLines = false;
     bool seeItemsInOrder = false;
+    bool firstOrderLine = false;
     Order seeMyItems;
     List<OrderLine> seeMyItemsSpec;
 
@@ -343,19 +344,21 @@ else
 
 
 
-    private void PrepareNewOrderLine(OrderLine addOrderLine) //////////////
+    private async Task PrepareNewOrderLine(OrderLine addOrderLine) //////////////
     {
         //gör en metod där jag gör en orderlist som är kopplad mot det tidigare prepOrder objektet
 
-        orderRepo.AddNewOrderLine(addOrderLine, prepNewOrder);
+        await orderRepo.AddNewOrderLine(addOrderLine, prepNewOrder);
+        prepNewOrderLine = new OrderLine();
+
     }
-    private void AddNewOrder(Order o) /////////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
+    private async Task AddNewOrder(Order o) /////////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
     {
         //en order måste ha en kund, om den inte finns så kan den inte skapas
         //avoid duplicate
         if (avoidDuplicate == false)
         {
-            orderRepo.AddNewOrder(o);
+            await orderRepo.AddNewOrder(o);
             avoidDuplicate = true;
         }
 
@@ -372,7 +375,28 @@ else
 
     }
 
+    private async Task NewOrderAndOrderLines(Order firstOrder, OrderLine orderLineItem)
+    { //lägga till ordern i listan OM det är vårat första item, samt först orderline i listan
+      //om det inte är vårat första item så ska den endast uppdatera i listan för orderline
 
+        prepareOrderLine = await orderRepo.GetOrderLinesAsync();
+
+        if (firstOrderLine == false)
+        {
+            firstOrderLine = true;
+
+            displayOrders.Add(firstOrder);
+            prepareOrderLine.Add(orderLineItem);
+            await PrepareNewOrderLine(orderLineItem);
+        }
+        else //vårat andra eller fler items
+        {
+            prepareOrderLine.Add(orderLineItem);
+            await PrepareNewOrderLine(orderLineItem);
+
+
+        }
+    }
 
 
     //uppdateringsfunktinoalitet för ordrar

@@ -11,12 +11,10 @@ namespace ProductCatalogueApplication.Data.Interfaces
     {
 
         //en metod för att addera en ny order
-        public void AddNewOrder(Order newOrder)
-        {
-        }
-        public void AddNewOrderLine(OrderLine newOrderLine, Order matchingOrder)
-        {
-        }
+        Task AddNewOrder(Order newOrder);
+        
+        Task AddNewOrderLine(OrderLine newOrderLine, Order matchingOrder);
+        
 
         //en metod för att hämta alla Orders som finns i databasen
 
