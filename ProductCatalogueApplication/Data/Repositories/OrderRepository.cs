@@ -153,7 +153,6 @@ namespace ProductCatalogueApplication.Data
                 _context.SaveChanges();     
             }
             ResetRestockDays(allOrders); //en metod för att reseta restock days om de är uppnådda efteråt
-
         }
         private void ResetRestockDays(List<Order> resetRestockDays)
         {
