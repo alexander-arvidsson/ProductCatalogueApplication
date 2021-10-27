@@ -32,7 +32,6 @@
                 @foreach (var b in displayProducts)
                 {
                     <tr>
-
                         <td>@b.Id</td>
                         <td>@b.Name </td>
                         <td>@b.Price</td>
@@ -40,7 +39,6 @@
                         <td>@b.Description</td>
                         <td><button class="btn btn-danger" @onclick="(() => RemoveProduct(b))">Remove</button></td>
                         <td><button class="btn btn-outline-info" @onclick="(() => SetProductForUpdate(b))">Update</button></td>
-
                     </tr>
                 }
             }
