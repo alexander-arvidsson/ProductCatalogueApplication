@@ -64,25 +64,27 @@
 
 @if (IsUpdating == true)
 {
-    <EditForm Model="@updatedOrder" OnValidSubmit="(() => UpdateOrder())">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
+<EditForm Model="@updatedOrder" OnValidSubmit="(() => UpdateOrder())">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <InputSelectNumber id="customer" @bind-Value="@updatedOrder.CustomerId">
 
-        <div class="form-group">
-            <label for="customerId">Customer Id</label>
-            <input @bind-value="@updatedOrder.CustomerId" type="number" />
-        </div>
-        <div class="form-group">
-            <label for="adress">Order Adress</label>
-            <input @bind-value="@updatedOrder.DeliveryAdress" type="text" />
-        </div>
+        @foreach (Customer cust in displayCustomers)
+            {
+            <option value="@cust.Id"> @cust.Name {@cust.Id} </option>
+            }
+    </InputSelectNumber>
+    <div class="form-group">
+        <label for="adress">Order Adress</label>
+        <input @bind-value="@updatedOrder.DeliveryAdress" type="text" />
+    </div>
 
 
 
 
 
-        <button class="btn btn-info" type="submit">Update Order</button>
-    </EditForm>
+    <button class="btn btn-info" type="submit">Update Order</button>
+</EditForm>
 }
 
 <h2 class="alert-light">Lägg en ny order och välj sedan vilka items som ska inkluderas </h2>
