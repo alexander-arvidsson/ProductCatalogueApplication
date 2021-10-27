@@ -170,10 +170,8 @@ namespace ProductCatalogueApplication.Data
 
                     }
                 }
-                
             }
             _context.SaveChanges();
-
         }
 
         public void AddMoreStock(Product giveItMoreStock, int neededStock)
@@ -185,8 +183,8 @@ namespace ProductCatalogueApplication.Data
 
         public void UpdateOrder(Order specOrder)
         {
+            _context.Orders.Update(specOrder);
             _context.SaveChanges();
-            
         }
 
         public async Task<List<Order>> DisplayArchivedCustomerOrder(Customer customer)
@@ -210,6 +208,7 @@ namespace ProductCatalogueApplication.Data
             {
                 order.PaymentCompleted = false;
             }
+            _context.SaveChanges();
         }
 
         public void deleteNoItemsOrders() //vi har en funktion för att ta bort ordrar som inte har några items eftersom de inte då fyller någon funktion och kan stöka till i Databasen
