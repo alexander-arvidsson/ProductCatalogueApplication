@@ -112,15 +112,52 @@ namespace ProductCatalogueApplication.Data
             }
             _context.SaveChanges();
         }
-        public List<Order> GetDispatched(List<Order> allOrders)
+        public async Task<List<Order>> GetDispatched()
+        {
+            return await _context.Orders.Where(ord => ord.Dispatched == true).ToListAsync();
+        }
+
+        /*
+        public List<Order> GetDispatched1(List<Order> allOrders)
         {
             List<Order> filtered = new List<Order>();
 
             filtered = allOrders.Where(b => b.Dispatched == true).ToList();
 
             return filtered;
+        }*/
+        public async Task <List<Order>> GetPending()
+        {
+            List<Order> filtered = new List<Order>();
+            List<OrderLine> shortestRestockDateOL = new List<OrderLine>();
+            List<OrderLine> getPending = new List<OrderLine>();
+            Product checkPro = new Product();
+
+            filtered = await _context.Orders.Where(b => b.Dispatched == false).ToListAsync();
+            foreach (Order ord in filtered)
+            {
+                getPending = await _context.OrderLines.Where(ol => ol.OrderId == ord.Id).ToListAsync();
+                shortestRestockDateOL.AddRange(getPending);
+
+            }
+            shortestRestockDateOL = shortestRestockDateOL.OrderByDescending(s => s.Product.RestockingDate).ToList(); //får en lista av orderlines där vi sorterar utefter restockDate
+                                                                                                                     //LÄGG in så att filtered är sorterade utefter restockDate
+            List<Order> filtered2 = new List<Order>();
+            foreach (OrderLine ordLine in shortestRestockDateOL) //filtrering så att vi får orders sorterade efter deras restocking date, eftersom orderlines med kortast restocking date kommer först i ordLine
+            {
+                Order filteredOrder = await _context.Orders.Where(o => o.Id == ordLine.OrderId).FirstOrDefaultAsync(); //Vi skapar en order för varje orderline
+                filtered2.Add(filteredOrder);
+
+
+            }
+            filtered2 = filtered2.Distinct().ToList();
+            filtered = filtered2;
+
+
+            return filtered;
         }
-        public List<Order> GetPending(List<Order> allOrders)
+
+        /*public List<Order> GetPending1(List<Order> allOrders)
         {
             List<Order> filtered = new List<Order>();
             List<OrderLine> shortestRestockDateOL = new List<OrderLine>();
@@ -147,7 +184,7 @@ namespace ProductCatalogueApplication.Data
             filtered = filtered2;
 
             return filtered;
-        }
+        }*/
 
 
         /** 
