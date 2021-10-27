@@ -52,6 +52,7 @@ namespace ProductCatalogueApplication.Data
         }
 
         [Required(ErrorMessage = "A quantity is required.")]
+        [Range(1, int.MaxValue, ErrorMessage = "At least 1 product is required.")]
         public int Quantity
         {
             get { return _quantity; }
