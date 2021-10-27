@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+ï»¿using Microsoft.EntityFrameworkCore;
 using ProductCatalogueApplication.Data.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -59,13 +59,15 @@ namespace ProductCatalogueApplication.Data
 
         public void AddMoreStock(Product giveItMoreStock, int neededStock)
         {
-            //Vi har nått dagen då stock kommer in och vi räknar då hur mycket som ska in kanske inte super realistiskt eftersom räkningen borde ske innan men finns ingen sån egenskap i databasen
-            giveItMoreStock.Stock += neededStock;
-
+            //Vi har nï¿½tt dagen dï¿½ stock kommer in och vi rï¿½knar dï¿½ hur mycket som ska in kanske inte super realistiskt eftersom rï¿½kningen borde ske innan men finns ingen sï¿½n egenskap i databasen
+            giveItMoreStock.Stock = giveItMoreStock.Stock + neededStock + 20; //lÃ¤gger Ã¤ven in 20 extra.
+            _context.SaveChanges();
         }
         public void UpdateOrder(Order specOrder)
         {
+            _context.Orders.Update(specOrder);
             _context.SaveChanges();
+            
         }
 
         public async Task<List<Order>> DisplayArchivedCustomerOrder(Customer customer)
@@ -88,8 +90,9 @@ namespace ProductCatalogueApplication.Data
             {
                 order.PaymentCompleted = false;
             }
+            _context.SaveChanges();
         }
-        public void deleteNoItemsOrders() //vi har en funktion för att ta bort ordrar som inte har några items eftersom de inte då fyller någon funktion och kan stöka till i Databasen
+        public void deleteNoItemsOrders() //vi har en funktion fï¿½r att ta bort ordrar som inte har nï¿½gra items eftersom de inte dï¿½ fyller nï¿½gon funktion och kan stï¿½ka till i Databasen
         {
             List<Order> noItemsOrders = new List<Order>();
             noItemsOrders = _context.Orders.Where(b => b.Items.Count() == 0).ToList();
@@ -119,13 +122,13 @@ namespace ProductCatalogueApplication.Data
                     getPending = _context.OrderLines.Where(ol => ol.OrderId == ord.Id).ToList();
                     shortestRestockDateOL.AddRange(getPending);
                 }
-                shortestRestockDateOL = shortestRestockDateOL.OrderByDescending(s => s.Product.RestockingDate).ToList(); //får en lista av orderlines där vi sorterar utefter restockDate
-                                                                                                                         //LÄGG in så att filtered är sorterade utefter restockDate
+                shortestRestockDateOL = shortestRestockDateOL.OrderByDescending(s => s.Product.RestockingDate).ToList(); //fï¿½r en lista av orderlines dï¿½r vi sorterar utefter restockDate
+                                                                                                                         //Lï¿½GG in sï¿½ att filtered ï¿½r sorterade utefter restockDate
 
                 List<Order> filtered2 = new List<Order>();
-                foreach (OrderLine ordLine in shortestRestockDateOL) //filtrering så att vi får orders sorterade efter deras restocking date, eftersom orderlines med kortast restocking date kommer först i ordLine
+                foreach (OrderLine ordLine in shortestRestockDateOL) //filtrering sï¿½ att vi fï¿½r orders sorterade efter deras restocking date, eftersom orderlines med kortast restocking date kommer fï¿½rst i ordLine
                 {
-                    Order filteredOrder = allOrders.Where(o => o.Id == ordLine.OrderId).FirstOrDefault(); //Vi skapar en order för varje orderline
+                    Order filteredOrder = allOrders.Where(o => o.Id == ordLine.OrderId).FirstOrDefault(); //Vi skapar en order fï¿½r varje orderline
                     filtered2.Add(filteredOrder);
                 }
                 filtered2 = filtered2.Distinct().ToList();
@@ -169,11 +172,11 @@ namespace ProductCatalogueApplication.Data
 
         private int GetProcessedOrderQuantity(Order ord, OrderLine checkQuantity, Product prod)
         {
-            if (prod.Stock - checkQuantity.Quantity >= 0) // vi kollar om stock räcker
+            if (prod.Stock - checkQuantity.Quantity >= 0) // vi kollar om stock rï¿½cker
             {
                 return GetPayedAndQuantityNumber(ord, checkQuantity, prod);
             }
-            else //stock räcker inte så vi kollar på restock date
+            else //stock rï¿½cker inte sï¿½ vi kollar pï¿½ restock date
             {
                 return GetStockedProductAndQuantityNumber(checkQuantity, prod);
             }
@@ -186,19 +189,19 @@ namespace ProductCatalogueApplication.Data
 
         private int GetStockedProductAndQuantityNumber(OrderLine ordLine, Product prod)
         {
-            if (prod.RestockingDate.ToString().Equals("0001-01-01 00:00:00")) //betyder att den inte har ett restocking date och vi sätter ett
+            if (prod.RestockingDate.ToString().Equals("0001-01-01 00:00:00")) //betyder att den inte har ett restocking date och vi sï¿½tter ett
             {
                 prod.RestockingDate = DateTime.Now.AddDays(10);
                 return 0;
             }
-            else //vi har ett restockdate, om det är nu så kan vi restocka, annars väntar vi
+            else //vi har ett restockdate, om det ï¿½r nu sï¿½ kan vi restocka, annars vï¿½ntar vi
             {
-                if (DateTime.Now >= prod.RestockingDate) //vi har nått Restocking Date och fyller på med så många som behövs samt skickar iväg ordern
+                if (DateTime.Now >= prod.RestockingDate) //vi har nï¿½tt Restocking Date och fyller pï¿½ med sï¿½ mï¿½nga som behï¿½vs samt skickar ivï¿½g ordern
                 {
                     int neededStock = prod.Stock - ordLine.Quantity;
                     neededStock = Math.Abs(neededStock);
-                    AddMoreStock(prod, neededStock); //vi addar så mcyket som behövs
-                    prod.Stock -= ordLine.Quantity;  //ANDRA SCENARIOT DÅ EN ORDERLINE ÄR OK
+                    AddMoreStock(prod, neededStock); //vi addar sï¿½ mcyket som behï¿½vs
+                    prod.Stock -= ordLine.Quantity;  //ANDRA SCENARIOT Dï¿½ EN ORDERLINE ï¿½R OK
 
                     return ordLine.Quantity;
                 }

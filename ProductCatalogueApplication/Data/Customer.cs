@@ -27,7 +27,7 @@ namespace ProductCatalogueApplication.Data
         }
 
         //+Name : string
-        [Required]        //[StringLength(20, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 3)]
+        [Required(ErrorMessage = "A name is required.")]        //[StringLength(20, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 3)]
         [StringLength(20, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
         public string Name
         {
@@ -36,7 +36,7 @@ namespace ProductCatalogueApplication.Data
         }
 
         //+Phone : string
-        [Required]
+        [Required(ErrorMessage = "A phone number is required.")]
         [StringLength(20, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
         public string Phone
         {
@@ -45,8 +45,8 @@ namespace ProductCatalogueApplication.Data
         }
 
         //+Email : string
-        [Required]
-        [StringLength(30, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
+        [Required(ErrorMessage = "An email is required.")]
+        [StringLength(40, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
         public string Email
         {
             get { return _email; }
