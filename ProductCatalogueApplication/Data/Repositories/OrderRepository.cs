@@ -263,7 +263,6 @@ namespace ProductCatalogueApplication.Data
                 filtered2 = filtered2.Distinct().ToList();
                 filtered = filtered2;
             }
-
             return filtered;
         }
 

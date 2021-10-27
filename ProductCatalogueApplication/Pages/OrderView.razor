@@ -23,7 +23,7 @@
             /**/
         </InputSelectNumber>
         <div class="form-group">
-            <label for="adress">Order Adress</label>
+            <label for="adress">Delivery Adress</label>
             <input @bind-value="@updatedOrder.DeliveryAdress" type="text" />
         </div>
         <button class="btn btn-info" type="submit">Update Order</button>
@@ -36,7 +36,7 @@ else
         <DataAnnotationsValidator />
         <ValidationSummary />
         <div class="form-group">
-            <label for="adress"> Order Adress </label>
+            <label for="adress">Delivery Adress</label>
             <input @bind-value="@prepNewOrder.DeliveryAdress" type="text" />
         </div>
         <label for="customer"> Customer </label>

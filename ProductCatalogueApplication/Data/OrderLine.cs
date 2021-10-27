@@ -51,7 +51,7 @@ namespace ProductCatalogueApplication.Data
             set { _order = value; }
         }
 
-        [Required]
+        [Required(ErrorMessage = "A quantity is required.")]
         public int Quantity
         {
             get { return _quantity; }
