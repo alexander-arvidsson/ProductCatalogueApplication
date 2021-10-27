@@ -177,8 +177,8 @@ namespace ProductCatalogueApplication.Data
         public void AddMoreStock(Product giveItMoreStock, int neededStock)
         {
             //Vi har nått dagen då stock kommer in och vi räknar då hur mycket som ska in kanske inte super realistiskt eftersom räkningen borde ske innan men finns ingen sån egenskap i databasen
-            giveItMoreStock.Stock = giveItMoreStock.Stock + neededStock;
-
+            giveItMoreStock.Stock = giveItMoreStock.Stock + neededStock + 20; //lägger även in 20 extra.
+            _context.SaveChanges();
         }
 
         public void UpdateOrder(Order specOrder)
