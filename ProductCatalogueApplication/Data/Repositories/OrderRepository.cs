@@ -153,7 +153,6 @@ namespace ProductCatalogueApplication.Data
                 _context.SaveChanges();     
             }
             ResetRestockDays(allOrders); //en metod för att reseta restock days om de är uppnådda efteråt
-
         }
         private void ResetRestockDays(List<Order> resetRestockDays)
         {
@@ -170,23 +169,21 @@ namespace ProductCatalogueApplication.Data
 
                     }
                 }
-                
             }
             _context.SaveChanges();
-
         }
 
         public void AddMoreStock(Product giveItMoreStock, int neededStock)
         {
             //Vi har nått dagen då stock kommer in och vi räknar då hur mycket som ska in kanske inte super realistiskt eftersom räkningen borde ske innan men finns ingen sån egenskap i databasen
-            giveItMoreStock.Stock = giveItMoreStock.Stock + neededStock;
-
+            giveItMoreStock.Stock = giveItMoreStock.Stock + neededStock + 20; //lägger även in 20 extra.
+            _context.SaveChanges();
         }
 
         public void UpdateOrder(Order specOrder)
         {
+            _context.Orders.Update(specOrder);
             _context.SaveChanges();
-            
         }
 
         public async Task<List<Order>> DisplayArchivedCustomerOrder(Customer customer)
@@ -210,6 +207,7 @@ namespace ProductCatalogueApplication.Data
             {
                 order.PaymentCompleted = false;
             }
+            _context.SaveChanges();
         }
 
         public void deleteNoItemsOrders() //vi har en funktion för att ta bort ordrar som inte har några items eftersom de inte då fyller någon funktion och kan stöka till i Databasen
@@ -264,7 +262,6 @@ namespace ProductCatalogueApplication.Data
                 filtered2 = filtered2.Distinct().ToList();
                 filtered = filtered2;
             }
-            
             return filtered;
         }
 

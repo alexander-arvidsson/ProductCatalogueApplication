@@ -21,7 +21,7 @@ namespace ProductCatalogueApplication.Data
             set { _id = value; }
         }
 
-        [Required] //Längden måste vara minst 1 tecken och max 30.
+        [Required(ErrorMessage = "A product name is required.")] //Längden måste vara minst 1 tecken och max 30.
         [StringLength(30, ErrorMessage = " {0} length must be between {2} and {1}.", MinimumLength = 1)]
         public string Name
         {
@@ -29,14 +29,14 @@ namespace ProductCatalogueApplication.Data
             set { _name = value; }
         }
 
-        [Required]
+        [Required(ErrorMessage = "A product description is required.")]
         public string Description
         {
             get { return _description; }
             set { _description = value; }
         }
 
-        [Required]
+        [Required(ErrorMessage = "A price is required.")]
         [Range(0, double.MaxValue)] //Priset behöver vara minst 0
         public double Price
         {
@@ -44,7 +44,7 @@ namespace ProductCatalogueApplication.Data
             set { _price = value; }
         }
 
-        [Required]
+        [Required(ErrorMessage = "A stock is required.")]
         [Range(0, 9999, ErrorMessage = " {0} must be between {1} and {2}.")] //tog bara ett random värde som säger att vi inte kan gå under 0 i stock eller över 9999
         public int Stock
         {
