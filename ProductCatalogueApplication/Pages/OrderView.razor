@@ -31,26 +31,26 @@
             {
                 @foreach (var b in displayOrders)
                 {
-            <tr>
+                    <tr>
 
-                <td>@b.Id</td>
-                <td>@b.CustomerId</td>
-                <td>@b.DeliveryAdress </td>
-                <td>@b.Dispatched</td>
-                <td>@b.OrderDate</td>
-                <td>@b.PaymentCompleted</td>
-                
-                <td>
-                    <button class="btn btn-outline-info" type="button" @onclick="(() => SeeItemsInOrder(b))"> See @b.Items.Count() items </button>
-                </td>
-                <td>
-                    <button class="btn btn-outline-success" type="button" @onclick="(() => SetForUpdate(b))"> Uppdatera Orderinfo </button>
+                        <td>@b.Id</td>
+                        <td>@b.CustomerId</td>
+                        <td>@b.DeliveryAdress </td>
+                        <td>@b.Dispatched</td>
+                        <td>@b.OrderDate</td>
+                        <td>@b.PaymentCompleted</td>
 
-                    <button type="button" @onclick="() => SetPayment(true, b)" class="btn btn-danger">Not Payed</button>
-                    <button type="button" @onclick="() => SetPayment(false, b)" class="btn btn-success">Payed</button>
-                </td>
+                        <td>
+                            <button class="btn btn-outline-info" type="button" @onclick="(() => SeeItemsInOrder(b))"> See @b.Items.Count() items </button>
+                        </td>
+                        <td>
+                            <button class="btn btn-outline-success" type="button" @onclick="(() => SetForUpdate(b))"> Uppdatera Orderinfo </button>
 
-            </tr>
+                            <button type="button" @onclick="() => SetPayment(true, b)" class="btn btn-danger">Not Payed</button>
+                            <button type="button" @onclick="() => SetPayment(false, b)" class="btn btn-success">Payed</button>
+                        </td>
+
+                    </tr>
                 }
             }
         </tbody>
@@ -170,7 +170,13 @@ else
                     <th>Product Price</th>
                     <th>Quantity</th>
                     <th>Restocking Date</th>
+                    <th>
+                        @if (seeMyItems.Dispatched == false && seeMyItems.PaymentCompleted == false)
+                        {
+                            <button type="button" @onclick="() => AddItem(seeMyItems)" class="btn btn-success">Add Item</button>
 
+                        }
+                    </th>
 
 
                 </tr>
@@ -197,7 +203,14 @@ else
                         <td>@b.Product.RestockingDate </td>
 
                     }
+                    @if (b.Order.Dispatched == false && b.Order.PaymentCompleted == false)
+                    {
+                        <td>
+                            <button type="button" @onclick="() => DeleteItem(b)" class="btn btn-danger">Delete Item</button>
 
+                        </td>
+                        
+                    }
 
 
                 </tr>
@@ -234,20 +247,20 @@ else
                 {
                     @foreach (Order b in onlyDispatchedOrders)
                     {
-                <tr>
+                        <tr>
 
-                    <td>@b.Id</td>
-                    <td>@b.CustomerId</td>
-                    <td>@b.DeliveryAdress </td>
-                    <td>@b.Dispatched</td>
-                    <td>@b.OrderDate</td>
-                    <td>@b.PaymentCompleted</td>
-                    <td>@b.Items.Count()</td>
-                    <td>
-                        <button class="btn btn-outline-info" type="button" @onclick="(() => SeeItemsInOrder(b))"> See @b.Items.Count() items </button>
-                    </td>
+                            <td>@b.Id</td>
+                            <td>@b.CustomerId</td>
+                            <td>@b.DeliveryAdress </td>
+                            <td>@b.Dispatched</td>
+                            <td>@b.OrderDate</td>
+                            <td>@b.PaymentCompleted</td>
+                            <td>@b.Items.Count()</td>
+                            <td>
+                                <button class="btn btn-outline-info" type="button" @onclick="(() => SeeItemsInOrder(b))"> See @b.Items.Count() items </button>
+                            </td>
 
-                </tr>
+                        </tr>
                     }
                 }
             </tbody>
@@ -282,22 +295,22 @@ else
                 {
                     @foreach (Order b in onlyPendingOrders)
                     {
-                <tr>
+                        <tr>
 
-                    <td>@b.Id</td>
-                    <td>@b.CustomerId</td>
-                    <td>@b.DeliveryAdress </td>
-                    <td>@b.Dispatched</td>
-                    <td>@b.OrderDate</td>
-                    <td>@b.PaymentCompleted</td>
-                    <td>@b.Items.Count()</td>
-                    <td>
-                        <button class="btn btn-outline-info" type="button" @onclick="(() => SeeItemsInOrder(b))"> See @b.Items.Count() items </button>
-                    </td>
+                            <td>@b.Id</td>
+                            <td>@b.CustomerId</td>
+                            <td>@b.DeliveryAdress </td>
+                            <td>@b.Dispatched</td>
+                            <td>@b.OrderDate</td>
+                            <td>@b.PaymentCompleted</td>
+                            <td>@b.Items.Count()</td>
+                            <td>
+                                <button class="btn btn-outline-info" type="button" @onclick="(() => SeeItemsInOrder(b))"> See @b.Items.Count() items </button>
+                            </td>
 
-                </tr>
+                        </tr>
                     }
-                    
+
                 }
             </tbody>
         </table>
@@ -349,6 +362,12 @@ else
         //gör en metod där jag gör en orderlist som är kopplad mot det tidigare prepOrder objektet
 
         await orderRepo.AddNewOrderLine(addOrderLine, prepNewOrder);
+
+        if(seeMyItemsSpec != null)
+        {
+            seeMyItemsSpec.Add(addOrderLine); //lägger till i våran lista som visas i gui
+
+        }
         prepNewOrderLine = new OrderLine();
 
     }
@@ -364,6 +383,12 @@ else
 
     }
 
+    private void AddItem(Order bindToOrder)
+    {
+        readyOrderLines = true; //vi öppnar upp add item formuläret
+        prepNewOrder = bindToOrder;
+
+    }
     private void PrepareNewOrder(Order prepareForOrder) //////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
     {
         //en order måste ha en kund, om den inte finns så kan den inte skapas
@@ -407,22 +432,39 @@ else
     Order closeOpenSeeItems = new Order();
     Order closeOpenUpdateOrder = new Order();
 
-    private void ProcessBatchorders(List<Order> allOrders) //får skicka med båda objekten så att vi kan hålla koll på stock osv
+    private void ProcessBatchorders(List<Order> allOrders)
     {
         dispatched = false;
         pending = false;
         orderRepo.ProcessBatchorders(allOrders);
 
     }
-    private void UpdateOrder() //får skicka med båda objekten så att vi kan hålla koll på stock osv
+    private void UpdateOrder()
     {
+
         orderRepo.UpdateOrder(updatedOrder);
 
     }
-    private void SetForUpdate(Order selectedOrder) //får skicka med båda objekten så att vi kan hålla koll på stock osv
+    private void DeleteItem(OrderLine itemToBeDeleted)
+    {
+        if( seeMyItemsSpec != null)
+        {
+            seeMyItemsSpec.Remove(itemToBeDeleted); //tar bort från  våran lista som visas i gui
+
+        }
+        if(itemToBeDeleted.Order.Items.Count() == 1)
+        {
+            displayOrders.Remove(itemToBeDeleted.Order);
+            seeItemsInOrder = false;
+
+        }
+        orderRepo.DeleteItem(itemToBeDeleted);
+
+    }
+    private void SetForUpdate(Order selectedOrder)
     {
 
-        if(IsUpdating == true && closeOpenUpdateOrder == selectedOrder)
+        if (IsUpdating == true && closeOpenUpdateOrder == selectedOrder)
         {
             IsUpdating = false;
         }
@@ -470,7 +512,7 @@ else
     private void GetDispatchedOrdersOnly()
     {
 
-        if(dispatched == true)
+        if (dispatched == true)
         {
             dispatched = false;
         }
@@ -478,13 +520,13 @@ else
         {
             pending = false;
             dispatched = true;
-            onlyDispatchedOrders = orderRepo.GetDispatchedAndPending(displayOrders, true);
+            onlyDispatchedOrders = orderRepo.GetDispatched(displayOrders);
         }
     }
     private void GetPendingOrdersOnly()
     {
 
-        if(pending == true)
+        if (pending == true)
         {
             pending = false;
         }
@@ -492,7 +534,7 @@ else
         {
             dispatched = false;
             pending = true;
-            onlyPendingOrders = orderRepo.GetDispatchedAndPending(displayOrders, false);
+            onlyPendingOrders = orderRepo.GetPending(displayOrders);
         }
 
     }

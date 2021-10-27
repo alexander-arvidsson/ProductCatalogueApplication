@@ -70,7 +70,7 @@ namespace ProductCatalogueApplication.Data
         {
             //OrderLine checkProduct = (OrderLine)_context.OrderLines.Where(ol=>ol.OrderId == toBeUpdated.Id);
             //gör en lista som sorterar utefter längst datum
-            List<Order> sortedByLongest = allOrders.OrderBy(b => b.OrderDate).ToList(); //vi servar först de som har väntat längst
+            List<Order> sortedByLongest = allOrders.Where(b => b.Dispatched == true).OrderBy(b => b.OrderDate).ToList(); //vi servar först de som har väntat längst och vi är bara intresserade av dispatched
             bool dispatchWholeOrder = true;
             List<int> tempStocks = new List<int>();
 
@@ -82,65 +82,64 @@ namespace ProductCatalogueApplication.Data
                 tempStocks.Clear();
                 dispatchWholeOrder = true;
 
-                if(ord.Dispatched == false) // vi är endast intresserade av ordrar som inte är skickade
+                
+                foreach (OrderLine ordLine in checkProducts) //vi kollar varje orderline hos de olika odrarna
                 {
-                    foreach (OrderLine ordLine in checkProducts) //vi kollar varje orderline hos de olika odrarna
-                    {
-                        Product checkPro = _context.Products.Where(ol => ol.Id == ordLine.ProductId).FirstOrDefault();
+                    Product checkPro = _context.Products.Where(ol => ol.Id == ordLine.ProductId).FirstOrDefault();
                         
-                        if (checkPro.Stock - ordLine.Quantity >= 0) // vi kollar om stock räcker
+                    if (checkPro.Stock - ordLine.Quantity >= 0) // vi kollar om stock räcker
 
+                    {
+                        if (ord.PaymentCompleted == true) //den är betald och stock räcker
                         {
-                            if (ord.PaymentCompleted == true) //den är betald och stock räcker
-                            {
-                                tempStocks.Add(ordLine.Quantity);                                //vi memorerar hur mycket stock som tas
-                                checkPro.Stock = checkPro.Stock - ordLine.Quantity; //FÖRSTA SCENARIOT DÅ EN ORDERLINE ÄR OK
-                            }
-                            else // det finns stock men ordern är inte betald
-                            {
-                                dispatchWholeOrder = false;
-                                tempStocks.Add(0); //vi memorer att vi inte tar något
-                            }
-                            
+                            tempStocks.Add(ordLine.Quantity);                                //vi memorerar hur mycket stock som tas
+                            checkPro.Stock = checkPro.Stock - ordLine.Quantity; //FÖRSTA SCENARIOT DÅ EN ORDERLINE ÄR OK
                         }
-                        else //stock räcker inte så vi kollar på restock date
+                        else // det finns stock men ordern är inte betald
                         {
+                            dispatchWholeOrder = false;
+                            tempStocks.Add(0); //vi memorer att vi inte tar något
+                        }
+                            
+                    }
+                    else //stock räcker inte så vi kollar på restock date
+                    {
                                                         
-                            if (checkPro.RestockingDate.ToString().Equals("0001-01-01 00:00:00")) //betyder att den inte har ett restocking date och vi sätter ett
+                        if (checkPro.RestockingDate.ToString().Equals("0001-01-01 00:00:00")) //betyder att den inte har ett restocking date och vi sätter ett
+                        {
+                            checkPro.RestockingDate = DateTime.Now.AddDays(10);
+                            tempStocks.Add(0); //vi tar då inget stock eftersom det inte finns ett restock date än
+                            dispatchWholeOrder = false; //vi sätter också boolen dispatchWholeOrder till falsk eftersom inte kan skickas
+                        }
+                        else //vi har ett restockdate, om det är nu så kan vi restocka, annars väntar vi
+                        {
+                            if (DateTime.Now >= checkPro.RestockingDate) //vi har nått Restocking Date och fyller på med så många som behövs samt skickar iväg ordern
                             {
-                                checkPro.RestockingDate = DateTime.Now.AddDays(10);
-                                tempStocks.Add(0); //vi tar då inget stock eftersom det inte finns ett restock date än
-                                dispatchWholeOrder = false; //vi sätter också boolen dispatchWholeOrder till falsk eftersom inte kan skickas
+
+                                int neededStock = checkPro.Stock - ordLine.Quantity;
+                                neededStock = Math.Abs(neededStock);
+                                tempStocks.Add(ordLine.Quantity); //vi memorerar hur mcyket stock som tas, om en produkt blir restocked så tar vi endast quantoity vilket betyder att den kan bli ett överskott 
+                                AddMoreStock(checkPro, neededStock); //vi addar så mcyket som behövs
+                                checkPro.Stock = checkPro.Stock - ordLine.Quantity;  //ANDRA SCENARIOT DÅ EN ORDERLINE ÄR OK
+
+
                             }
-                            else //vi har ett restockdate, om det är nu så kan vi restocka, annars väntar vi
+                            else //dagen har inte kommit ännu...
                             {
-                                if (DateTime.Now >= checkPro.RestockingDate) //vi har nått Restocking Date och fyller på med så många som behövs samt skickar iväg ordern
-                                {
+                                tempStocks.Add(0); //vi tar då inget stock eftersom vi inte har kommit till vårat restock date än
+                                dispatchWholeOrder = false;//vi har inte nått fram ännu till restock dagen
 
-                                    int neededStock = checkPro.Stock - ordLine.Quantity;
-                                    neededStock = Math.Abs(neededStock);
-                                    tempStocks.Add(ordLine.Quantity); //vi memorerar hur mcyket stock som tas, om en produkt blir restocked så tar vi endast quantoity vilket betyder att den kan bli ett överskott 
-                                    AddMoreStock(checkPro, neededStock); //vi addar så mcyket som behövs
-                                    checkPro.Stock = checkPro.Stock - ordLine.Quantity;  //ANDRA SCENARIOT DÅ EN ORDERLINE ÄR OK
-
-
-                                }
-                                else //dagen har inte kommit ännu...
-                                {
-                                    tempStocks.Add(0); //vi tar då inget stock eftersom vi inte har kommit till vårat restock date än
-                                    dispatchWholeOrder = false;//vi har inte nått fram ännu till restock dagen
-
-                                }
                             }
                         }
                     }
                 }
-                if (dispatchWholeOrder == true && ord.PaymentCompleted == true && ord.Dispatched == false) //ordern är betald och ännu inte skickad samt att bolen inte säger ifrån 
+                
+                if (dispatchWholeOrder == true && ord.PaymentCompleted == true) //ordern är betald och ännu inte skickad samt att bolen inte säger ifrån 
                 {
                     ord.Dispatched = true;
 
                 }
-                else if (ord.Dispatched == false && dispatchWholeOrder == false)//betyder att en av orderlinsen inte gick att skicka och då  måste vi lämna tillbaka stocks för nästa order
+                else if (dispatchWholeOrder == false)//betyder att en av orderlinsen inte gick att skicka och då  måste vi lämna tillbaka stocks för nästa order
                 {
                     int counter = 0;
                     foreach (OrderLine ordLine2 in checkProducts)
@@ -188,6 +187,15 @@ namespace ProductCatalogueApplication.Data
             _context.SaveChanges();
             
         }
+        public void DeleteItem(OrderLine toBeDeleted)
+        {
+            _context.OrderLines.Remove(toBeDeleted);
+            if(toBeDeleted.Order.Items.Count() == 1) //vi raderar hela ordern om inga items finnsinuti
+            {
+                _context.Orders.Remove(toBeDeleted.Order);
+            }
+            _context.SaveChanges();
+        }
 
         public async Task<List<Order>> DisplayArchivedCustomerOrder(Customer customer)
         {
@@ -210,6 +218,7 @@ namespace ProductCatalogueApplication.Data
             {
                 order.PaymentCompleted = false;
             }
+            _context.SaveChanges();
         }
 
         public void deleteNoItemsOrders() //vi har en funktion för att ta bort ordrar som inte har några items eftersom de inte då fyller någon funktion och kan stöka till i Databasen
@@ -222,51 +231,47 @@ namespace ProductCatalogueApplication.Data
             }
             _context.SaveChanges();
         }
-        public List<Order> GetDispatchedAndPending(List<Order> allOrders, bool choice)
+        public List<Order> GetDispatched(List<Order> allOrders)
+        {
+            List<Order> filtered = new List<Order>();
+ 
+            filtered = allOrders.Where(b => b.Dispatched == true).ToList();
+
+            return filtered;
+        }
+
+
+        public List<Order> GetPending(List<Order> allOrders)
         {
             List<Order> filtered = new List<Order>();
             List<OrderLine> shortestRestockDateOL = new List<OrderLine>();
-
             List<OrderLine> getPending = new List<OrderLine>();
-
             Product checkPro = new Product();
-            bool pendingOrder = false;
-            DateTime compare = DateTime.MinValue;
-
-            if (choice == true) //dispatched
+  
+            filtered = allOrders.Where(b => b.Dispatched == false).ToList();
+            foreach (Order ord in filtered)
             {
-                filtered = allOrders.Where(b => b.Dispatched == true).ToList();
+                getPending = _context.OrderLines.Where(ol => ol.OrderId == ord.Id).ToList();
+                shortestRestockDateOL.AddRange(getPending);
+                
             }
-            else //pending
+            shortestRestockDateOL = shortestRestockDateOL.OrderByDescending(s => s.Product.RestockingDate).ToList(); //får en lista av orderlines där vi sorterar utefter restockDate
+                                                                                                                        //LÄGG in så att filtered är sorterade utefter restockDate
+            List<Order> filtered2 = new List<Order>();
+            foreach (OrderLine ordLine in shortestRestockDateOL) //filtrering så att vi får orders sorterade efter deras restocking date, eftersom orderlines med kortast restocking date kommer först i ordLine
             {
-                filtered = allOrders.Where(b => b.Dispatched == false).ToList();
-                foreach(Order ord in filtered)
-                {
-                    getPending = _context.OrderLines.Where(ol => ol.OrderId == ord.Id).ToList();
-                    shortestRestockDateOL.AddRange(getPending);
-                    /*foreach(OrderLine ordLine in getPending)
-                    {
-                        shortestRestockDateOL.Add(ordLine);
-                    }
-                    */
-                }
-                shortestRestockDateOL = shortestRestockDateOL.OrderByDescending(s => s.Product.RestockingDate).ToList(); //får en lista av orderlines där vi sorterar utefter restockDate
-                                                                                                         //LÄGG in så att filtered är sorterade utefter restockDate
+                Order filteredOrder = allOrders.Where(o => o.Id == ordLine.OrderId).FirstOrDefault(); //Vi skapar en order för varje orderline
+                filtered2.Add(filteredOrder);
 
-                List<Order> filtered2 = new List<Order>();
-                foreach (OrderLine ordLine in shortestRestockDateOL) //filtrering så att vi får orders sorterade efter deras restocking date, eftersom orderlines med kortast restocking date kommer först i ordLine
-                {
-                    Order filteredOrder = allOrders.Where(o => o.Id == ordLine.OrderId).FirstOrDefault(); //Vi skapar en order för varje orderline
-                    filtered2.Add(filteredOrder);
-                    
 
-                }
-                filtered2 = filtered2.Distinct().ToList();
-                filtered = filtered2;
             }
+            filtered2 = filtered2.Distinct().ToList();
+            filtered = filtered2;
             
+
             return filtered;
         }
+
 
     }
 }

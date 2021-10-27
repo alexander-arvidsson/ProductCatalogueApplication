@@ -42,19 +42,16 @@ namespace ProductCatalogueApplication.Data.Interfaces
         {
 
         }
+        void DeleteItem(OrderLine itemToBeDeleted);
         public void AddMoreStock( Product giveProStock, int neededStock)
         {
 
         }
         //Visa dispatched och pending orders separat (ska finnas mer info kring när saker kan skeppas osv)
 
-        public List<Order> GetDispatchedAndPending(List<Order> allOrders, bool choice)
-        {
-            //dispatched är bara de som är dispatch true och pending är de ordrar till är kopplade till produkter som har restocking date (inte riktigt sant dock eftersom den kan vara en mindre order som räcker med stock)
-            //pending är där paymentCompleted är sant men quantity är mer är stock
-            throw new Exception();
+        List<Order> GetDispatched(List<Order> allOrders);
+        List<Order> GetPending(List<Order> allOrders);
 
-        }
 
         public void SetPayment(bool payedOrNot, Order order)
         {
