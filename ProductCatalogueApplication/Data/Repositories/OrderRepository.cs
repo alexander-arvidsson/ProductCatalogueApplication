@@ -169,7 +169,6 @@ namespace ProductCatalogueApplication.Data
             {
                 getPending = _context.OrderLines.Where(ol => ol.OrderId == ord.Id).ToList();
                 shortestRestockDateOL.AddRange(getPending);
-
             }
             shortestRestockDateOL = shortestRestockDateOL.OrderByDescending(s => s.Product.RestockingDate).ToList(); //får en lista av orderlines där vi sorterar utefter restockDate
                                                                                                                      //LÄGG in så att filtered är sorterade utefter restockDate
@@ -183,7 +182,6 @@ namespace ProductCatalogueApplication.Data
             }
             filtered2 = filtered2.Distinct().ToList();
             filtered = filtered2;
-
 
             return filtered;
         }*/
@@ -221,24 +219,20 @@ namespace ProductCatalogueApplication.Data
             _context.SaveChanges();
         }
 
-        private int GetProcessedOrderQuantity(Order ord, OrderLine checkQuantity, Product prod)
+        private int GetProcessedOrderQuantity(Order ord, OrderLine takenQuantity, Product prod)
         {
-            if (prod.Stock - checkQuantity.Quantity >= 0) // vi kollar om stock r�cker
+            if (prod.Stock - takenQuantity.Quantity >= 0) // vi kollar om stock r�cker
             {
-                return GetPayedAndQuantityNumber(ord, checkQuantity, prod);
+                prod.Stock -= takenQuantity.Quantity;
+                return takenQuantity.Quantity;
             }
             else //stock r�cker inte s� vi kollar p� restock date
             {
-                return GetStockedProductAndQuantityNumber(checkQuantity, prod);
+                return GetStockedProductAndQuantityNumber(takenQuantity, prod);
             }
         }
-        private int GetPayedAndQuantityNumber(Order ord, OrderLine checkQuantity, Product prod)
-        {
-            prod.Stock -= checkQuantity.Quantity;
-            return ord.PaymentCompleted == true ? checkQuantity.Quantity : 0;
-        }
 
-        private int GetStockedProductAndQuantityNumber(OrderLine ordLine, Product prod)
+        private int GetStockedProductAndQuantityNumber(OrderLine takenQuantity, Product prod)
         {
             if (prod.RestockingDate.ToString().Equals("0001-01-01 00:00:00")) //betyder att den inte har ett restocking date och vi s�tter ett
             {
@@ -249,12 +243,12 @@ namespace ProductCatalogueApplication.Data
             {
                 if (DateTime.Now >= prod.RestockingDate) //vi har n�tt Restocking Date och fyller p� med s� m�nga som beh�vs samt skickar iv�g ordern
                 {
-                    int neededStock = prod.Stock - ordLine.Quantity;
+                    int neededStock = prod.Stock - takenQuantity.Quantity;
                     neededStock = Math.Abs(neededStock);
                     AddMoreStock(prod, neededStock); //vi addar s� mcyket som beh�vs
-                    prod.Stock -= ordLine.Quantity;  //ANDRA SCENARIOT D� EN ORDERLINE �R OK
+                    prod.Stock -= takenQuantity.Quantity;  //ANDRA SCENARIOT D� EN ORDERLINE �R OK
 
-                    return ordLine.Quantity;
+                    return takenQuantity.Quantity;
                 }
                 else
                 {
