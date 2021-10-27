@@ -411,7 +411,7 @@ else
     {
         dispatched = false;
         pending = false;
-        orderRepo.ProcessBatchorders(allOrders);
+        orderRepo.BatchAndProcess(allOrders);
 
     }
     private void UpdateOrder() //får skicka med båda objekten så att vi kan hålla koll på stock osv
