@@ -19,8 +19,6 @@ namespace ProductCatalogueApplication.Data
             Items = new List<OrderLine>();
         }
 
-        //[Required]
-        //[Range(1, int.MaxValue)]
         public int Id
         {
             get { return _id; }
@@ -49,8 +47,8 @@ namespace ProductCatalogueApplication.Data
             set { _orderDate = value; }
         }
 
-        [Required]
-        [StringLength(30, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
+        [Required(ErrorMessage = "A delivery adress is required")]
+        [StringLength(40, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
         public string DeliveryAdress
         {
             get { return _deliveryAdress; }
