@@ -145,15 +145,6 @@ else
                     <th>Product Price</th>
                     <th>Quantity</th>
                     <th>Restocking Date</th>
-                    <th>
-                        @if (seeMyItems.Dispatched == false && seeMyItems.PaymentCompleted == false)
-                        {
-                            <button type="button" @onclick="() => AddItem(seeMyItems)" class="btn btn-success">Add Item</button>
-
-                        }
-                    </th>
-
-
                 </tr>
             </thead>
             <tbody>
@@ -161,34 +152,21 @@ else
                 {
                     @foreach (OrderLine b in seeMyItemsSpec)
                     {
-                <tr>
-
-                    <td>@b.Id</td>
-                    <td>@b.ProductId</td>
-                    <td>@b.Product.Name</td>
-                    <td>@b.Product.Price $</td>
-                    <td>@b.Quantity </td>
-                    @if (b.Product.RestockingDate.ToString().Equals("0001-01-01 00:00:00"))
-                    {
-                        <td>No restocking date </td>
-
-                    }
-                    else
-                    {
-                        <td>@b.Product.RestockingDate </td>
-
-                    }
-                    @if (b.Order.Dispatched == false && b.Order.PaymentCompleted == false)
-                    {
-                        <td>
-                            <button type="button" @onclick="() => DeleteItem(b)" class="btn btn-danger">Delete Item</button>
-
-                        </td>
-                        
-                    }
-
-
-                </tr>
+                        <tr>
+                            <td>@b.Id</td>
+                            <td>@b.ProductId</td>
+                            <td>@b.Product.Name</td>
+                            <td>@b.Product.Price $</td>
+                            <td>@b.Quantity </td>
+                            @if (b.Product.RestockingDate.ToString().Equals("0001-01-01 00:00:00"))
+                            {
+                                <td>No restocking date </td>
+                            }
+                            else
+                            {
+                                <td>@b.Product.RestockingDate </td>
+                            }
+                        </tr>
                     }
                 }
             </tbody>
@@ -229,10 +207,7 @@ else
                             <td>@b.OrderDate</td>
                             <td>@b.PaymentCompleted</td>
                             <td>@b.Items.Count()</td>
-                            <td>
-                                <button class="btn btn-outline-info" type="button" @onclick="(() => SeeItemsInOrder(b))"> See @b.Items.Count() items </button>
-                            </td>
-
+                            <td><button class="btn btn-outline-info" type="button" @onclick="(() => SeeItemsInOrder(b))"> See @b.Items.Count() items </button></td>
                         </tr>
                     }
                 }
@@ -271,13 +246,9 @@ else
                             <td>@b.OrderDate</td>
                             <td>@b.PaymentCompleted</td>
                             <td>@b.Items.Count()</td>
-                            <td>
-                                <button class="btn btn-outline-info" type="button" @onclick="(() => SeeItemsInOrder(b))"> See @b.Items.Count() items </button>
-                            </td>
-
+                            <td><button class="btn btn-outline-info" type="button" @onclick="(() => SeeItemsInOrder(b))">See @b.Items.Count() items</button></td>
                         </tr>
                     }
-
                 }
             </tbody>
         </table>
@@ -327,12 +298,6 @@ else
         //gör en metod där jag gör en orderlist som är kopplad mot det tidigare prepOrder objektet
 
         await orderRepo.AddNewOrderLine(addOrderLine, prepNewOrder);
-
-        if(seeMyItemsSpec != null)
-        {
-            seeMyItemsSpec.Add(addOrderLine); //lägger till i våran lista som visas i gui
-
-        }
         prepNewOrderLine = new OrderLine();
 
     }
@@ -348,12 +313,6 @@ else
 
     }
 
-    private void AddItem(Order bindToOrder)
-    {
-        readyOrderLines = true; //vi öppnar upp add item formuläret
-        prepNewOrder = bindToOrder;
-
-    }
     private void PrepareNewOrder(Order prepareForOrder) //////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
     {
         //en order måste ha en kund, om den inte finns så kan den inte skapas
@@ -397,37 +356,19 @@ else
     Order closeOpenSeeItems = new Order();
     Order closeOpenUpdateOrder = new Order();
 
-    private void ProcessBatchorders(List<Order> allOrders)
+    private void ProcessBatchorders(List<Order> allOrders) //får skicka med båda objekten så att vi kan hålla koll på stock osv
     {
         dispatched = false;
         pending = false;
         orderRepo.BatchAndProcess(allOrders);
 
     }
-    private void UpdateOrder()
+    private void UpdateOrder() //får skicka med båda objekten så att vi kan hålla koll på stock osv
     {
-
         orderRepo.UpdateOrder(updatedOrder);
     }
 
-    
-    private void DeleteItem(OrderLine itemToBeDeleted)
-    {
-        if( seeMyItemsSpec != null)
-        {
-            seeMyItemsSpec.Remove(itemToBeDeleted); //tar bort från  våran lista som visas i gui
-
-        }
-        if(itemToBeDeleted.Order.Items.Count() == 1)
-        {
-            displayOrders.Remove(itemToBeDeleted.Order);
-            seeItemsInOrder = false;
-
-        }
-        orderRepo.DeleteItem(itemToBeDeleted);
-
-    }
-    private void SetForUpdate(Order selectedOrder)
+    private void SetForUpdate(Order selectedOrder) //får skicka med båda objekten så att vi kan hålla koll på stock osv
     {
 
         if (IsUpdating == true && closeOpenUpdateOrder == selectedOrder)
@@ -486,13 +427,12 @@ else
         {
             pending = false;
             dispatched = true;
-            onlyDispatchedOrders = orderRepo.GetDispatched(displayOrders);
+            onlyDispatchedOrders = orderRepo.GetDispatchedAndPending(displayOrders, true);
         }
     }
 
     private void GetPendingOrdersOnly()
     {
-
         if (pending == true)
         {
             pending = false;
@@ -501,7 +441,7 @@ else
         {
             dispatched = false;
             pending = true;
-            onlyPendingOrders = orderRepo.GetPending(displayOrders);
+            onlyPendingOrders = orderRepo.GetDispatchedAndPending(displayOrders, false);
         }
     }
 
