@@ -20,7 +20,6 @@
                 {
                 <option value="@cust.Id"> @cust.Name {@cust.Id} </option>
                 }
-            /**/
         </InputSelectNumber>
         <div class="form-group">
             <label for="adress">Delivery Adress</label>
@@ -45,7 +44,6 @@ else
                 {
                 <option value="@cust.Id"> @cust.Name {@cust.Id} </option>
                 }
-            /**/
         </InputSelectNumber>
         <button class="btn btn-success" type="submit"> Add Order </button>
     </EditForm>
@@ -62,25 +60,15 @@ else
                 {
                 <option value="@prod.Id"> @prod.Name {@prod.Price $} </option>
                 }
-            /**/
         </InputSelectNumber>
         <div class="form-group">
-            <label for="customerId"> Quantity </label>
+            <label for="quantity"> Quantity </label>
             <input @bind-value="@prepNewOrderLine.Quantity" type="number" />
         </div>
         <button class="btn btn-outline-secondary" type="submit"> Add item to your current order </button>
     </EditForm>
     <button class="btn btn-warning" @onclick="() => DoneAddingItems()"> Done adding items? </button>
 }
-
-<!-- <select type="text" id="products" class="form-control select-picker" @bind="@FilterFunction">
-    <option value="1">All orders</option>
-    <option value="2">Dispatched orders</option>
-    <option value="3">Pending orders</option>
-</select>
-<br>
-<button class="btn btn-info" type="button" @onclick="@FilterGUI">Filter</button>
-<p></p>-->
 
 <h3>Current orders</h3>
 <div class="row bg-light">
@@ -127,14 +115,25 @@ else
             }
         </tbody>
     </table>
-    <button class="btn btn-outline-success" type="button" @onclick="(() => ProcessBatchorders(displayOrders))"> Process Batchorders </button>
-    <button class="btn btn-outline-dark" type="button" @onclick="(() => GetDispatchedOrdersOnly())"> Show Dispatched Orders </button>
-    <button class="btn btn-outline-dark" type="button" @onclick="(() => GetPendingOrdersOnly())"> Show Pending Orders </button>
 </div>
+
+<select type="text" id="products" class="form-control select-picker" @bind="@FilterFunction">
+    <option value="1">All orders</option>
+    <option value="2">Dispatched orders</option>
+    <option value="3">Pending orders</option>
+</select>
+<br>
+<button class="btn btn-info" type="button" @onclick="@FilterGUI">Filter</button>
+<p></p>
+
+<button class="btn btn-success" type="button" @onclick="(() => ProcessBatchorders(displayOrders))"> Process Batchorders </button>
+<!--<button class="btn btn-outline-dark" type="button" @onclick="(() => GetDispatchedOrdersOnly())"> Show Dispatched Orders </button>
+<button class="btn btn-outline-dark" type="button" @onclick="(() => GetPendingOrdersOnly())"> Show Pending Orders </button>-->
+<p></p>
 
 @if (seeItemsInOrder == true)
 {
-    <h1 class="alert-light">Items inuti den valda ordern </h1>
+    <h4>Produkter inuti den valda ordern</h4>
     <div class="row bg-light">
         <table class="table table-bordered">
             <thead class="thead-dark">
@@ -146,14 +145,11 @@ else
                     <th>Quantity</th>
                     <th>Restocking Date</th>
                     <th>
-                        @if (seeMyItems.Dispatched == false && seeMyItems.PaymentCompleted == false)
+                        @if (seeMyItems.PaymentCompleted == false)
                         {
                             <button type="button" @onclick="() => AddItem(seeMyItems)" class="btn btn-success">Add Item</button>
-
                         }
                     </th>
-
-
                 </tr>
             </thead>
             <tbody>
@@ -161,41 +157,34 @@ else
                 {
                     @foreach (OrderLine b in seeMyItemsSpec)
                     {
-                <tr>
-
-                    <td>@b.Id</td>
-                    <td>@b.ProductId</td>
-                    <td>@b.Product.Name</td>
-                    <td>@b.Product.Price $</td>
-                    <td>@b.Quantity </td>
-                    @if (b.Product.RestockingDate.ToString().Equals("0001-01-01 00:00:00"))
-                    {
-                        <td>No restocking date </td>
-
-                    }
-                    else
-                    {
-                        <td>@b.Product.RestockingDate </td>
-
-                    }
-                    @if (b.Order.Dispatched == false && b.Order.PaymentCompleted == false)
-                    {
-                        <td>
-                            <button type="button" @onclick="() => DeleteItem(b)" class="btn btn-danger">Delete Item</button>
-
-                        </td>
-                        
-                    }
-
-
-                </tr>
+                        <tr>
+                            <td>@b.Id</td>
+                            <td>@b.ProductId</td>
+                            <td>@b.Product.Name</td>
+                            <td>@b.Product.Price $</td>
+                            <td>@b.Quantity </td>
+                            @if (b.Product.RestockingDate.ToString().Equals("0001-01-01 00:00:00"))
+                            {
+                                <td>No restocking date </td>
+                            }
+                            else
+                            {
+                                <td>@b.Product.RestockingDate </td>
+                            }
+                            @if (b.Order.PaymentCompleted == false)
+                            {
+                                <td>
+                                    <button type="button" @onclick="() => DeleteItem(b)" class="btn btn-danger">Delete Item</button>
+                                </td>
+                            }
+                        </tr>
                     }
                 }
             </tbody>
         </table>
     </div>
 }
-
+<!--
 @if (dispatched == true)
 {
     <h1 class="alert-light">Dispatched Orders </h1>
@@ -282,12 +271,11 @@ else
             </tbody>
         </table>
     </div>
-
-}
+}-->
 @code{
     //Order updateOrder = new Order();
-    bool dispatched = false;
-    bool pending = false;
+    //bool dispatched = false;
+    //bool pending = false;
 
 
     Order prepNewOrder = new Order();
@@ -307,8 +295,8 @@ else
     List<Order> displayOrders;
     List<OrderLine> prepareOrderLine;
 
-    List<Order> onlyPendingOrders;
-    List<Order> onlyDispatchedOrders;
+    //List<Order> onlyPendingOrders;
+    //List<Order> onlyDispatchedOrders;
 
 
     protected override async Task OnInitializedAsync()
@@ -328,7 +316,7 @@ else
 
         await orderRepo.AddNewOrderLine(addOrderLine, prepNewOrder);
 
-        if(seeMyItemsSpec != null)
+        if (seeMyItemsSpec != null)
         {
             seeMyItemsSpec.Add(addOrderLine); //lägger till i våran lista som visas i gui
 
@@ -383,8 +371,6 @@ else
         {
             prepareOrderLine.Add(orderLineItem);
             await PrepareNewOrderLine(orderLineItem);
-
-
         }
     }
 
@@ -399,26 +385,25 @@ else
 
     private void ProcessBatchorders(List<Order> allOrders)
     {
-        dispatched = false;
-        pending = false;
+        //dispatched = false;
+        //pending = false;
         orderRepo.BatchAndProcess(allOrders);
 
     }
     private void UpdateOrder()
     {
-
         orderRepo.UpdateOrder(updatedOrder);
     }
 
-    
+
     private void DeleteItem(OrderLine itemToBeDeleted)
     {
-        if( seeMyItemsSpec != null)
+        if (seeMyItemsSpec != null)
         {
             seeMyItemsSpec.Remove(itemToBeDeleted); //tar bort från  våran lista som visas i gui
 
         }
-        if(itemToBeDeleted.Order.Items.Count() == 1)
+        if (itemToBeDeleted.Order.Items.Count() == 1)
         {
             displayOrders.Remove(itemToBeDeleted.Order);
             seeItemsInOrder = false;
@@ -474,7 +459,7 @@ else
         }
 
     }
-
+    /*
     private void GetDispatchedOrdersOnly()
     {
 
@@ -486,10 +471,9 @@ else
         {
             pending = false;
             dispatched = true;
-            onlyDispatchedOrders = orderRepo.GetDispatched(displayOrders);
+            onlyDispatchedOrders = orderRepo.GetDispatched1(displayOrders);
         }
     }
-
     private void GetPendingOrdersOnly()
     {
 
@@ -503,9 +487,9 @@ else
             pending = true;
             onlyPendingOrders = orderRepo.GetPending(displayOrders);
         }
-    }
+    }*/
 
-    /*
+
     public string FilterFunction { get; set; }
     private async Task FilterGUI()
     {
@@ -515,14 +499,14 @@ else
                 displayOrders = await orderRepo.GetOrdersAsync();
                 break;
             case "2":
-                displayOrders = await orderRepo.GetDispatchedAndPending(displayOrders, true);
+                displayOrders = await orderRepo.GetDispatched();
                 break;
             case "3":
-                displayOrders = await orderRepo.GetDispatchedAndPending(displayOrders, false);
+                displayOrders = await orderRepo.GetPending();
                 break;
             default:
                 displayOrders = await orderRepo.GetOrdersAsync();
                 break;
         }
-    }*/
+    }
 }

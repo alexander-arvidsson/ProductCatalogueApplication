@@ -14,23 +14,14 @@ namespace ProductCatalogueApplication.Data.Interfaces
         Task AddNewOrder(Order newOrder);
         
         Task AddNewOrderLine(OrderLine newOrderLine, Order matchingOrder);
-        
+
 
         //en metod för att hämta alla Orders som finns i databasen
 
-        public Task<List<Order>> GetOrdersAsync()
-        {
-            throw new Exception();
-        }
+        Task<List<Order>> GetOrdersAsync();
 
-        public Task<List<Order>> GetOrdersAsync(int id)
-        {
-            throw new Exception();
-        }
-        public async Task<List<OrderLine>> GetOrderLinesAsync()
-        {
-            throw new Exception();
-        }
+        Task<List<Order>> GetOrdersAsync(int id);
+        Task<List<OrderLine>> GetOrderLinesAsync();
 
         //en metod för att uppdatera en existerande order
 
@@ -49,8 +40,10 @@ namespace ProductCatalogueApplication.Data.Interfaces
         }
         //Visa dispatched och pending orders separat (ska finnas mer info kring när saker kan skeppas osv)
 
-        List<Order> GetDispatched(List<Order> allOrders);
-        List<Order> GetPending(List<Order> allOrders);
+        //public List<Order> GetDispatched1(List<Order> allOrders);
+        Task <List<Order>> GetDispatched();
+        //List<Order> GetPending1(List<Order> allOrders);
+        Task <List<Order>> GetPending();
 
 
         public void SetPayment(bool payedOrNot, Order order)
