@@ -19,6 +19,9 @@ namespace ProductCatalogueApplication.Data
             Items = new List<OrderLine>();
         }
 
+        /// <summary>
+        /// The unique Order ID saved as an int.
+        /// </summary>
         public int Id
         {
             get { return _id; }
@@ -27,6 +30,10 @@ namespace ProductCatalogueApplication.Data
 
         [Required]
         [Range(0, int.MaxValue)]
+
+        /// <summary>
+        /// The customer ID saved as an int.
+        /// </summary>
         public int CustomerId
         {
             get { return _customerId; }
@@ -34,6 +41,10 @@ namespace ProductCatalogueApplication.Data
         }
 
         //[Required]
+
+        /// <summary>
+        /// A customer saved as a Customer object.
+        /// </summary>
         public Customer Customer
         {
             get { return _customer; }
@@ -41,6 +52,10 @@ namespace ProductCatalogueApplication.Data
         }
 
         //[Required]
+
+        /// <summary>
+        /// The date the order was made saved as a DateTime data type.
+        /// </summary>
         public DateTime OrderDate
         {
             get { return _orderDate; }
@@ -49,6 +64,10 @@ namespace ProductCatalogueApplication.Data
 
         [Required(ErrorMessage = "A delivery adress is required")]
         [StringLength(40, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
+
+        /// <summary>
+        /// The delivery adress of the order saved as a string.
+        /// </summary>
         public string DeliveryAdress
         {
             get { return _deliveryAdress; }
@@ -56,6 +75,10 @@ namespace ProductCatalogueApplication.Data
         }
 
         [Required]
+
+        /// <summary>
+        /// A bool that describes whether or not a payment has been completed.
+        /// </summary>
         public bool PaymentCompleted
         {
             get { return _paymentCompleted; }
@@ -63,6 +86,10 @@ namespace ProductCatalogueApplication.Data
         }
 
         [Required]
+
+        /// <summary>
+        /// A bool that describes whether or not an order has been dispatched.
+        /// </summary>
         public bool Dispatched
         {
             get { return _dispatched; }
@@ -70,6 +97,9 @@ namespace ProductCatalogueApplication.Data
         }
 
         [Required]
+        /// <summary>
+        /// The orderline list of items in an order.
+        /// </summary>
         public List<OrderLine> Items
         {
             get { return _items; }

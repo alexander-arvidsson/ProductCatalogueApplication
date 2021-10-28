@@ -140,6 +140,7 @@
         <button class="btn btn-info" type="submit">Update Customer</button>
     </EditForm>
 }
+<p></p>
 
 @code{
     private List<Customer> displayCustomers;
@@ -155,10 +156,6 @@
         displayCustomers = await customerRepo.GetCustomersAsync();
         IsInspecting = false;
     }
-
-    //0. Lägg till en metod som sparar i databasen!
-    //1. Gör alla metoder till async eftersom det används mer i arbetslivet...
-    //2. Lägg till dispatched/not dispatched list-metod
 
    
     private async Task AddCustomer(Customer customer)

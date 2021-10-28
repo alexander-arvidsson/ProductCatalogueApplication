@@ -19,26 +19,53 @@ namespace ProductCatalogueApplication.Data
             _context = context;
         }
 
-        //Här kan vi lägga in metoder som rör Customer, bara för start en metod för att hämta alla customers som finns lagrade 
+       
+        /// <summary>
+        /// A method that fetches all the products stored in the database.
+        /// </summary>
+        /// <returns>A list of products</returns>
         public async Task<List<Product>> GetProductsAsync()
         {
             return await _context.Products.ToListAsync();
         }
+
+        /// <summary>
+        /// A method that adds products to the database.
+        /// </summary>
+        /// <param name="p">A specific product</param>
+        /// <returns>No return value in async task method</returns>
         public async Task AddProduct(Product p)
         {
-            _context.Products.Add(p);
+            await _context.Products.AddAsync(p);
             await _context.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// A method that removes products from the database.
+        /// </summary>
+        /// <param name="p">A specific product</param>
+        /// <returns>No return value in async task method</returns>
         public async Task RemoveProduct(Product p)
         {
             _context.Products.Remove(p);
             await _context.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// A method that updates the values of a product.
+        /// </summary>
+        /// <param name="p">A specific product</param>
+        /// <returns>No return value in async task method</returns>
         public async Task UpdateProduct(Product p)
         {
             _context.Products.Update(p);
             await _context.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// A method that displayes all the products where the stock number is 0.
+        /// </summary>
+        /// <returns>No return value in async task method</returns>
         public async Task<List<Product>> DisplayZeroStockAsync()
         {
             return await _context.Products.Where(p => p.Stock == 0).ToListAsync();
