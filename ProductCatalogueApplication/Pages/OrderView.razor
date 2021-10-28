@@ -236,8 +236,8 @@ else
 
         }
         prepNewOrderLine = new OrderLine();
-
     }
+
     private async Task AddNewOrder(Order o) /////////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
     {
         //en order måste ha en kund, om den inte finns så kan den inte skapas
@@ -247,7 +247,7 @@ else
             await orderRepo.AddNewOrder(o);
             avoidDuplicate = true;
         }
-
+        prepNewOrder = new Order();
     }
 
     private void AddItem(Order bindToOrder)
