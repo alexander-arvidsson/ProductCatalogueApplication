@@ -47,18 +47,18 @@ namespace ProductCatalogueApplication.Data
 
             newOrderLine.Product = await _context.Products.Where(ol => ol.Id == newOrderLine.ProductId).FirstOrDefaultAsync(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
 
-            bool noDuplicateProduct = true;
+            bool noDuplicateProduct = true; //bool som sätts till false ifall produkten redan existerar i ordern
 
-            foreach (OrderLine ol in OrderToMatch.Items)
+            foreach (OrderLine ol in OrderToMatch.Items) //kollar alla orderlines i ordern
             {
-                if (ol.Product == newOrderLine.Product)
+                if (ol.Product == newOrderLine.Product) //jämför orderlinens produkt med den nya produkten
                 {
-                    ol.Quantity += newOrderLine.Quantity;
+                    ol.Quantity += newOrderLine.Quantity; //ifall produkten redan finns i ordern adderas den nya kvantiteten till den ordinarie orderlinen
                     noDuplicateProduct = false;
                     await _context.SaveChangesAsync();
                 }
             }
-            if (noDuplicateProduct == true)
+            if (noDuplicateProduct == true) //om produkten inte fanns med i ordern skapas en ny orderline med den nya produkten
             {
                 await _context.OrderLines.AddAsync(newOrderLine);
             }
