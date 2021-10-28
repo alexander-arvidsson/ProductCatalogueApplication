@@ -32,7 +32,7 @@ namespace ProductCatalogueApplication.Data
         /// A method that adds a new customer to the database.
         /// </summary>
         /// <param name="customer">A specific customer</param>
-        /// <returns>Task</returns>
+        /// <returns>No return value</returns>
         public async Task AddCustomer(Customer customer)
         {
             _context.Add(customer);
@@ -42,8 +42,8 @@ namespace ProductCatalogueApplication.Data
         /// <summary>
         /// A method that removes a customer from the database.
         /// </summary>
-        /// <param name="customer"></param>
-        /// <returns>Task</returns>
+        /// <param name="customer">A specific customer</param>
+        /// <returns>No return value</returns>
         public async Task RemoveCustomer(Customer customer)
         {
             _context.Remove(customer);
@@ -53,8 +53,8 @@ namespace ProductCatalogueApplication.Data
         /// <summary>
         /// A method that updates customer information.
         /// </summary>
-        /// <param name="customer"></param>
-        /// <returns>Task</returns>
+        /// <param name="customer">A specific customer</param>
+        /// <returns>No return value</returns>
         public async Task UpdateCustomer(Customer customer)
         {
             _context.Update(customer);
