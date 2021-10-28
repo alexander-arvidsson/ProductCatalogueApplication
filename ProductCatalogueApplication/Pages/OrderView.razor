@@ -273,19 +273,14 @@ else
 
         prepareOrderLine = await orderRepo.GetOrderLinesAsync();
 
-        if (firstOrderLine == false)
+        if(!displayOrders.Contains(firstOrder))
         {
-            firstOrderLine = true;
-
             displayOrders.Add(firstOrder);
-            prepareOrderLine.Add(orderLineItem);
-            await PrepareNewOrderLine(orderLineItem);
         }
-        else //vårat andra eller fler items
-        {
-            prepareOrderLine.Add(orderLineItem);
-            await PrepareNewOrderLine(orderLineItem);
-        }
+
+        prepareOrderLine.Add(orderLineItem);
+        await PrepareNewOrderLine(orderLineItem);
+
         doneBool = true;
     }
 
@@ -351,6 +346,7 @@ else
     {
         avoidDuplicate = false;
         readyOrderLines = false;
+        prepNewOrder = new Order();
         await orderRepo.DeleteNoItemsOrders();
     }
 
