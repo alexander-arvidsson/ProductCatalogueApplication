@@ -100,18 +100,35 @@ namespace ProductCatalogueApplication.Data
             await ResetRestockDays(allOrders);
         }
 
-
+        /// <summary>
+        /// A method that adds missing stock of a product to fit the order requirement, and adds 20 extra items of the product as well.
+        /// </summary>
+        /// <param name="giveItMoreStock">The product that needs more stock</param>
+        /// <param name="neededStock">the missing stock number</param>
+        /// <returns>No return because of async task method</returns>
         public async Task AddMoreStock(Product giveItMoreStock, int neededStock)
         {
             giveItMoreStock.Stock = giveItMoreStock.Stock + neededStock + 20; //lägger även in 20 extra.
             await _context.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// A method that updates the order information.
+        /// </summary>
+        /// <param name="specOrder">The specific order</param>
+        /// <returns>No return because of async task method</returns>
         public async Task UpdateOrder(Order specOrder)
         {
             _context.Orders.Update(specOrder);
             await _context.SaveChangesAsync();
             
         }
+
+        /// <summary>
+        /// A method that deletes a specific orderline in an order, and deletes the whole order if there are no items inside it.
+        /// </summary>
+        /// <param name="toBeDeleted">The orderline that should be deleted.</param>
+        /// <returns>No return because of async task method</returns>
         public async Task DeleteItem(OrderLine toBeDeleted)
         {
             _context.OrderLines.Remove(toBeDeleted);
@@ -122,16 +139,32 @@ namespace ProductCatalogueApplication.Data
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="customer"></param>
+        /// <returns></returns>
         public async Task<List<Order>> DisplayArchivedCustomerOrder(Customer customer)
         {
             return await _context.Orders.Where(o => o.Dispatched == true && customer.Id == o.CustomerId).ToListAsync();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="customer"></param>
+        /// <returns></returns>
         public async Task<List<Order>> DisplayActiveCustomerOrder(Customer customer)
         {
             return await _context.Orders.Where(o => o.Dispatched == false && customer.Id == o.CustomerId).ToListAsync();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="payedOrNot"></param>
+        /// <param name="order"></param>
+        /// <returns></returns>
         public async Task SetPayment(bool payedOrNot, Order order)
         {
             if (payedOrNot == false)
@@ -144,7 +177,11 @@ namespace ProductCatalogueApplication.Data
             }
             await _context.SaveChangesAsync();
         }
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task DeleteNoItemsOrders()
         {
             List<Order> noItemsOrders = new List<Order>();
@@ -155,11 +192,20 @@ namespace ProductCatalogueApplication.Data
             }
             await _context.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<Order>> GetDispatched()
         {
             return await _context.Orders.Where(ord => ord.Dispatched == true).ToListAsync();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task <List<Order>> GetPending()
         {
             List<Order> filtered = new List<Order>();
