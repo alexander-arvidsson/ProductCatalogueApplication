@@ -20,18 +20,18 @@ namespace ProductCatalogueApplication.Data
         }
 
         /// <summary>
-        /// En metod som hämtar alla customers som finns lagrade.
+        /// A method that fetches all the customers stored in the database.
         /// </summary>
-        /// <returns>Task<List></returns>
+        /// <returns>A list of customers</returns>
         public async Task<List<Customer>> GetCustomersAsync()
         {
             return await _context.Customers.ToListAsync();
         }
 
         /// <summary>
-        /// En metod som lägger till en ny kund i databasen
+        /// A method that adds a new customer to the database.
         /// </summary>
-        /// <param name="customer"></param>
+        /// <param name="customer">A specific customer</param>
         /// <returns>Task</returns>
         public async Task AddCustomer(Customer customer)
         {
@@ -40,7 +40,7 @@ namespace ProductCatalogueApplication.Data
         }
 
         /// <summary>
-        /// En metod som tar bort en kund ur databasen
+        /// A method that removes a customer from the database.
         /// </summary>
         /// <param name="customer"></param>
         /// <returns>Task</returns>
@@ -51,7 +51,7 @@ namespace ProductCatalogueApplication.Data
         }
 
         /// <summary>
-        /// En metod som uppdaterar en kunds värden i databasen
+        /// A method that updates customer information.
         /// </summary>
         /// <param name="customer"></param>
         /// <returns>Task</returns>
