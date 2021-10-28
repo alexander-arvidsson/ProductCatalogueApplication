@@ -35,19 +35,33 @@ namespace ProductCatalogueApplication.Data
         public async Task AddNewOrder(Order newOrder)
         {
             newOrder.OrderDate = DateTime.Now;
-            newOrder.Customer = _context.Customers.Where(ol => ol.Id == newOrder.CustomerId).FirstOrDefault(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
-            _context.Orders.Add(newOrder);
+            newOrder.Customer = await _context.Customers.Where(ol => ol.Id == newOrder.CustomerId).FirstOrDefaultAsync(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
+            await _context.Orders.AddAsync(newOrder);
             await _context.SaveChangesAsync();
         }
 
         public async Task AddNewOrderLine(OrderLine newOrderLine, Order OrderToMatch)
         {
             newOrderLine.OrderId = OrderToMatch.Id;
-            newOrderLine.Order = _context.Orders.Where(ol => ol.Id == newOrderLine.OrderId).FirstOrDefault();
+            newOrderLine.Order = await _context.Orders.Where(ol => ol.Id == newOrderLine.OrderId).FirstOrDefaultAsync();
 
-            newOrderLine.Product = _context.Products.Where(ol => ol.Id == newOrderLine.ProductId).FirstOrDefault(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
+            newOrderLine.Product = await _context.Products.Where(ol => ol.Id == newOrderLine.ProductId).FirstOrDefaultAsync(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
 
-            _context.OrderLines.Add(newOrderLine);
+            bool noDuplicateProduct = true;
+
+            foreach (OrderLine ol in OrderToMatch.Items)
+            {
+                if (ol.Product == newOrderLine.Product)
+                {
+                    ol.Quantity += newOrderLine.Quantity;
+                    noDuplicateProduct = false;
+                    await _context.SaveChangesAsync();
+                }
+            }
+            if (noDuplicateProduct == true)
+            {
+                await _context.OrderLines.AddAsync(newOrderLine);
+            }
             await _context.SaveChangesAsync();
         }
 
