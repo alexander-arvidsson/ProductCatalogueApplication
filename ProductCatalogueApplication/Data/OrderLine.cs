@@ -17,6 +17,10 @@ namespace ProductCatalogueApplication.Data
 
         //[Required]
         //[Range(1, int.MaxValue)]
+
+        /// <summary>
+        /// The unique orderline stored in an int.
+        /// </summary>
         public int Id
         {
             get { return _id; }
@@ -24,6 +28,9 @@ namespace ProductCatalogueApplication.Data
         }
 
         [Required]
+        /// <summary>
+        /// The product ID stored in an int.
+        /// </summary>
         public int ProductId
         {
             get { return _productid; }
@@ -31,6 +38,9 @@ namespace ProductCatalogueApplication.Data
         }
 
         //[Required]
+        /// <summary>
+        /// A product object of the Product class.
+        /// </summary>
         public Product Product
         {
             get { return _product; }
@@ -38,6 +48,9 @@ namespace ProductCatalogueApplication.Data
         }
 
         //[Required]
+        /// <summary>
+        /// The order ID stored in an int.
+        /// </summary>
         public int OrderId
         {
             get { return _orderid; }
@@ -45,6 +58,9 @@ namespace ProductCatalogueApplication.Data
         }
 
         //[Required]
+        /// <summary>
+        /// An order object of the Order class
+        /// </summary>
         public Order Order
         {
             get { return _order; }
@@ -53,6 +69,9 @@ namespace ProductCatalogueApplication.Data
 
         [Required(ErrorMessage = "A quantity is required.")]
         [Range(1, int.MaxValue, ErrorMessage = "At least 1 product is required.")]
+        /// <summary>
+        /// The quantity of a product stored in an int.
+        /// </summary>
         public int Quantity
         {
             get { return _quantity; }
