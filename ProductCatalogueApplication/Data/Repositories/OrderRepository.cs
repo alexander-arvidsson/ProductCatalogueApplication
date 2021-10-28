@@ -102,6 +102,7 @@ namespace ProductCatalogueApplication.Data
             }
             _context.SaveChanges();
         }
+        
         public void deleteNoItemsOrders() //vi har en funktion f�r att ta bort ordrar som inte har n�gra items eftersom de inte d� fyller n�gon funktion och kan st�ka till i Databasen
         {
             List<Order> noItemsOrders = new List<Order>();

@@ -47,10 +47,14 @@ namespace ProductCatalogueApplication.Data
         }
 
         [Required(ErrorMessage = "A price is required.")]
+
         [Range(0, double.MaxValue)] //Priset behöver vara minst 0
         /// <summary>
         /// The product price saved as a double.
         /// </summary>
+
+        [Range(0, double.MaxValue, ErrorMessage ="{0} can not be a negative value")] //Priset behöver vara minst 0
+
         public double Price
         {
             get { return _price; }
@@ -58,11 +62,15 @@ namespace ProductCatalogueApplication.Data
         }
 
         [Required(ErrorMessage = "A stock is required.")]
+
         [Range(0, 9999, ErrorMessage = " {0} must be between {1} and {2}.")] //tog bara ett random värde som säger att vi inte kan gå under 0 i stock eller över 9999
 
         /// <summary>
         /// The product stock number saved as an int.
         /// </summary>
+
+        [Range(0, 9999, ErrorMessage = " {0} can not be a negative value")] //tog bara ett random värde som säger att vi inte kan gå under 0 i stock eller över 9999
+
         public int Stock
         {
             get { return _stock; }
