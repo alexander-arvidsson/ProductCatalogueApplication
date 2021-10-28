@@ -347,11 +347,11 @@ else
         orderRepo.SetPayment(payedOrNot, order);
     }
 
-    private void DoneAddingItems()
+    private async Task DoneAddingItems()
     {
         avoidDuplicate = false;
         readyOrderLines = false;
-        orderRepo.deleteNoItemsOrders();
+        await orderRepo.DeleteNoItemsOrders();
     }
 
     private void SeeItemsInOrder(Order seeInOrder) //Vi vill se vilka items som finns i en order och produkter kopplade till orderlines

@@ -60,7 +60,6 @@ namespace ProductCatalogueApplication.Data
 
         public async Task AddMoreStock(Product giveItMoreStock, int neededStock)
         {
-            //Vi har n�tt dagen d� stock kommer in och vi r�knar d� hur mycket som ska in kanske inte super realistiskt eftersom r�kningen borde ske innan men finns ingen s�n egenskap i databasen
             giveItMoreStock.Stock = giveItMoreStock.Stock + neededStock + 20; //lägger även in 20 extra.
             await _context.SaveChangesAsync();
         }
@@ -103,7 +102,7 @@ namespace ProductCatalogueApplication.Data
             await _context.SaveChangesAsync();
         }
         
-        public async Task DeleteNoItemsOrders() //vi har en funktion f�r att ta bort ordrar som inte har n�gra items eftersom de inte d� fyller n�gon funktion och kan st�ka till i Databasen
+        public async Task DeleteNoItemsOrders()
         {
             List<Order> noItemsOrders = new List<Order>();
             noItemsOrders = _context.Orders.Where(b => b.Items.Count() == 0).ToList();
@@ -243,7 +242,7 @@ namespace ProductCatalogueApplication.Data
                 List<OrderLine> checkProducts = _context.OrderLines.Where(ol => ol.OrderId == rest.Id).ToList();
                 foreach (OrderLine ordLine in checkProducts)
                 {
-                    Product checkPro = _context.Products.Where(ol => ol.Id == ordLine.ProductId).FirstOrDefault();
+                    Product checkPro = await _context.Products.Where(ol => ol.Id == ordLine.ProductId).FirstOrDefaultAsync();
 
                     if (DateTime.Now >= checkPro.RestockingDate)
                     {
