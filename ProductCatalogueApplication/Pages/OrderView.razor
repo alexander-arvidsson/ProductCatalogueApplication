@@ -36,7 +36,7 @@ else if (readyOrderLines == true)
         }
     </InputSelectNumber>
     <div class="form-group">
-        <label for="quantity"> Quantity </label>
+        <label for="quantity">Quantity</label>
         <input @bind-value="@prepNewOrderLine.Quantity" type="number" />
     </div>
     @if (prepNewOrderLine.ProductId != 0)
@@ -200,7 +200,6 @@ else
     bool avoidDuplicate = false;
     bool readyOrderLines = false;
     bool seeItemsInOrder = false;
-    bool firstOrderLine = false;
     bool doneBool = false;
     Order seeMyItems;
     List<OrderLine> seeMyItemsSpec;

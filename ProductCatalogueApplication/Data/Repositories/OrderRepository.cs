@@ -18,7 +18,6 @@ namespace ProductCatalogueApplication.Data
 
         public async Task<List<Order>> GetOrdersAsync()
         {
-
             return await _context.Orders.ToListAsync();
         }
 
@@ -266,7 +265,6 @@ namespace ProductCatalogueApplication.Data
             }
             await _context.SaveChangesAsync();
         }
-
     }
 }
 
