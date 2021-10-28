@@ -23,7 +23,6 @@ namespace ProductCatalogueApplication.Data
         /// <returns>Order-list</returns>
         public async Task<List<Order>> GetOrdersAsync()
         {
-
             return await _context.Orders.ToListAsync();
         }
 
@@ -31,7 +30,7 @@ namespace ProductCatalogueApplication.Data
         /// A method that matches a customerID to an order from the database.
         /// </summary>
         /// <param name="id">The customer ID</param>
-        /// <returns></returns>
+        /// <returns>All customerIDs with orders linked to them.</returns>
         public async Task<List<Order>> GetOrdersAsync(int id)
         {
             return await _context.Orders.Where(c => c.CustomerId == id).ToListAsync();
