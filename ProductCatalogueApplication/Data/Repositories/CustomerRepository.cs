@@ -35,7 +35,7 @@ namespace ProductCatalogueApplication.Data
         /// <returns>No return value</returns>
         public async Task AddCustomer(Customer customer)
         {
-            _context.Add(customer);
+            await _context.AddAsync(customer);
             await _context.SaveChangesAsync();
         }
 
