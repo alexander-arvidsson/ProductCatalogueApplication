@@ -59,7 +59,9 @@ namespace ProductCatalogueApplication.Data
         }
 
         /// <summary>
-        /// A method that adds a new orderline to an (already existing??) order
+        /// A method that adds a new orderline to an already existing order.
+        /// If the product already exists in the order then the number of the same product added will be added to the quantity.
+        /// If not then a new orderline of that product will simply be added.
         /// </summary>
         /// <param name="newOrderLine">A new object from the OrderLine class.</param>
         /// <param name="OrderToMatch">A new object from the Order class???</param>
@@ -140,10 +142,10 @@ namespace ProductCatalogueApplication.Data
         }
 
         /// <summary>
-        /// 
+        /// A method that displayes all the dispatched customer orders.
         /// </summary>
-        /// <param name="customer"></param>
-        /// <returns></returns>
+        /// <param name="customer">A customer object</param>
+        /// <returns>A list of all the dispatched customer orders</returns>
         public async Task<List<Order>> DisplayArchivedCustomerOrder(Customer customer)
         {
             return await _context.Orders.Where(o => o.Dispatched == true && customer.Id == o.CustomerId).ToListAsync();
