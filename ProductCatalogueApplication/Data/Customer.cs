@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ProductCatalogueApplication.Data
 {
-    //Fixa service-klass f?r alla klasser.
+ 
     public class Customer
     {
         private int _id;
@@ -18,42 +18,56 @@ namespace ProductCatalogueApplication.Data
             Orders = new List<Order>();
         }
 
-        //+Id : int
-       
+        /// <summary>
+        /// The customer ID saved as an int.
+        /// </summary>
         public int Id
         {
             get { return _id; }
             set { _id = value; }
         }
 
-        //+Name : string
+        
         [Required(ErrorMessage = "A name is required.")]        //[StringLength(20, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 3)]
         [StringLength(20, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
+
+        /// <summary>
+        /// The customer name saved as a string.
+        /// </summary>
         public string Name
         {
             get { return _name; }
             set { _name = value; }
         }
 
-        //+Phone : string
+        
         [Required(ErrorMessage = "A phone number is required.")]
         [StringLength(20, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
+
+        /// <summary>
+        /// The customer's phone number saved as a string.
+        /// </summary>
         public string Phone
         {
             get { return _phone; }
             set { _phone = value; }
         }
-
-        //+Email : string
+        
         [Required(ErrorMessage = "An email is required.")]
         [StringLength(40, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
+
+        /// <summary>
+        /// The customer's email saved as a string.
+        /// </summary>
         public string Email
         {
             get { return _email; }
             set { _email = value; }
         }
 
-        //+Orders : List<Order> 
+        /// <summary>
+        /// A list of orders.
+        /// </summary>
         public List<Order> Orders
         {
             get { return _orders; }

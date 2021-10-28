@@ -19,25 +19,42 @@ namespace ProductCatalogueApplication.Data
             _context = context;
         }
 
-        //H?r kan vi l?gga in metoder som r?r Customer, bara f?r start en metod f?r att h?mta alla customers som finns lagrade 
+        /// <summary>
+        /// A method that fetches all the customers stored in the database.
+        /// </summary>
+        /// <returns>A list of customers</returns>
         public async Task<List<Customer>> GetCustomersAsync()
         {
             return await _context.Customers.ToListAsync();
         }
 
-        //Customer Add metod
+        /// <summary>
+        /// A method that adds a new customer to the database.
+        /// </summary>
+        /// <param name="customer">A specific customer</param>
+        /// <returns>Task</returns>
         public async Task AddCustomer(Customer customer)
         {
             _context.Add(customer);
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// A method that removes a customer from the database.
+        /// </summary>
+        /// <param name="customer"></param>
+        /// <returns>Task</returns>
         public async Task RemoveCustomer(Customer customer)
         {
             _context.Remove(customer);
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// A method that updates customer information.
+        /// </summary>
+        /// <param name="customer"></param>
+        /// <returns>Task</returns>
         public async Task UpdateCustomer(Customer customer)
         {
             _context.Update(customer);
