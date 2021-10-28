@@ -200,7 +200,6 @@ else
     bool avoidDuplicate = false;
     bool readyOrderLines = false;
     bool seeItemsInOrder = false;
-    bool firstOrderLine = false;
     bool doneBool = false;
     Order seeMyItems;
     List<OrderLine> seeMyItemsSpec;
@@ -228,11 +227,13 @@ else
     {
         //gör en metod där jag gör en orderlist som är kopplad mot det tidigare prepOrder objektet
 
-        await orderRepo.AddNewOrderLine(addOrderLine, prepNewOrder);
-        if (seeMyItemsSpec != null)
+        List<OrderLine> ordLine = seeMyItemsSpec.Where(p => p.ProductId == addOrderLine.ProductId).ToList();
+        if (!ordLine.Any())
         {
-            seeMyItemsSpec.Add(addOrderLine); //lägger till i våran lista som visas i gui
-        }
+            seeMyItemsSpec.Add(addOrderLine);
+        } 
+
+        await orderRepo.AddNewOrderLine(addOrderLine, prepNewOrder);
         prepNewOrderLine = new OrderLine();
     }
 
@@ -261,7 +262,7 @@ else
         readyOrderLines = true;
 
         await orderRepo.AddNewOrder(prepareForOrder); //lägger till okbjektet
-                                                //activeOrders.Add(o); //lägger till i denna lista tillfälligt för att göra så att vi kan gå vidare till orderlines
+                                                      //activeOrders.Add(o); //lägger till i denna lista tillfälligt för att göra så att vi kan gå vidare till orderlines
 
     }
 
@@ -343,6 +344,7 @@ else
         avoidDuplicate = false;
         readyOrderLines = false;
         doneBool = false;
+        prepNewOrder = new Order();
         await orderRepo.DeleteNoItemsOrders();
     }
 
