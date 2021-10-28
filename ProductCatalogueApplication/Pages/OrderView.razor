@@ -46,8 +46,7 @@ else if (readyOrderLines == true)
 </EditForm>
     if (doneBool == true)
     {
-<button id="done" class="btn btn-warning" @onclick="() => DoneAddingItems()">Done adding items?</button>
-        doneBool = false;
+        <button id="done" class="btn btn-warning" @onclick="() => DoneAddingItems()">Done adding items?</button>
     }
 }
 
@@ -233,7 +232,6 @@ else
         if (seeMyItemsSpec != null)
         {
             seeMyItemsSpec.Add(addOrderLine); //lägger till i våran lista som visas i gui
-
         }
         prepNewOrderLine = new OrderLine();
     }
@@ -242,12 +240,12 @@ else
     {
         //en order måste ha en kund, om den inte finns så kan den inte skapas
         //avoid duplicate
+        prepNewOrder = new Order();
         if (avoidDuplicate == false)
         {
             await orderRepo.AddNewOrder(o);
             avoidDuplicate = true;
         }
-        prepNewOrder = new Order();
     }
 
     private void AddItem(Order bindToOrder)
@@ -273,19 +271,12 @@ else
 
         prepareOrderLine = await orderRepo.GetOrderLinesAsync();
 
-        if (firstOrderLine == false)
+        if (!displayOrders.Contains(firstOrder))
         {
-            firstOrderLine = true;
-
             displayOrders.Add(firstOrder);
-            prepareOrderLine.Add(orderLineItem);
-            await PrepareNewOrderLine(orderLineItem);
         }
-        else //vårat andra eller fler items
-        {
-            prepareOrderLine.Add(orderLineItem);
-            await PrepareNewOrderLine(orderLineItem);
-        }
+        prepareOrderLine.Add(orderLineItem);
+        await PrepareNewOrderLine(orderLineItem);
         doneBool = true;
     }
 
@@ -351,6 +342,7 @@ else
     {
         avoidDuplicate = false;
         readyOrderLines = false;
+        doneBool = false;
         await orderRepo.DeleteNoItemsOrders();
     }
 
