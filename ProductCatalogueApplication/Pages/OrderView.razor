@@ -46,8 +46,7 @@ else if (readyOrderLines == true)
 </EditForm>
     if (doneBool == true)
     {
-<button id="done" class="btn btn-warning" @onclick="() => DoneAddingItems()">Done adding items?</button>
-        doneBool = false;
+        <button id="done" class="btn btn-warning" @onclick="() => DoneAddingItems()">Done adding items?</button>
     }
 }
 
@@ -233,21 +232,20 @@ else
         if (seeMyItemsSpec != null)
         {
             seeMyItemsSpec.Add(addOrderLine); //lägger till i våran lista som visas i gui
-
         }
         prepNewOrderLine = new OrderLine();
-
     }
+
     private async Task AddNewOrder(Order o) /////////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
     {
         //en order måste ha en kund, om den inte finns så kan den inte skapas
         //avoid duplicate
+        prepNewOrder = new Order();
         if (avoidDuplicate == false)
         {
             await orderRepo.AddNewOrder(o);
             avoidDuplicate = true;
         }
-
     }
 
     private void AddItem(Order bindToOrder)
@@ -256,13 +254,13 @@ else
         prepNewOrder = bindToOrder;
     }
 
-    private void PrepareNewOrder(Order prepareForOrder) //////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
+    private async Task PrepareNewOrder(Order prepareForOrder) //////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
     {
         //en order måste ha en kund, om den inte finns så kan den inte skapas
         //placeOrder = true;
         readyOrderLines = true;
 
-        orderRepo.AddNewOrder(prepareForOrder); //lägger till okbjektet
+        await orderRepo.AddNewOrder(prepareForOrder); //lägger till okbjektet
                                                 //activeOrders.Add(o); //lägger till i denna lista tillfälligt för att göra så att vi kan gå vidare till orderlines
 
     }
@@ -273,14 +271,12 @@ else
 
         prepareOrderLine = await orderRepo.GetOrderLinesAsync();
 
-        if(!displayOrders.Contains(firstOrder))
+        if (!displayOrders.Contains(firstOrder))
         {
             displayOrders.Add(firstOrder);
         }
-
         prepareOrderLine.Add(orderLineItem);
         await PrepareNewOrderLine(orderLineItem);
-
         doneBool = true;
     }
 
@@ -293,19 +289,19 @@ else
     Order closeOpenSeeItems = new Order();
     Order closeOpenUpdateOrder = new Order();
 
-    private void ProcessBatchorders(List<Order> allOrders)
+    private async Task ProcessBatchorders(List<Order> allOrders)
     {
-        orderRepo.BatchAndProcess(allOrders);
+        await orderRepo.BatchAndProcess(allOrders);
 
     }
-    private void UpdateOrder()
+    private async Task UpdateOrder()
     {
-        orderRepo.UpdateOrder(updatedOrder);
+        await orderRepo.UpdateOrder(updatedOrder);
         IsUpdating = false;
     }
 
 
-    private void DeleteItem(OrderLine itemToBeDeleted)
+    private async Task DeleteItem(OrderLine itemToBeDeleted)
     {
         if (seeMyItemsSpec != null)
         {
@@ -318,7 +314,7 @@ else
             seeItemsInOrder = false;
 
         }
-        orderRepo.DeleteItem(itemToBeDeleted);
+        await orderRepo.DeleteItem(itemToBeDeleted);
 
     }
     private void SetForUpdate(Order selectedOrder)
@@ -337,16 +333,16 @@ else
 
     }
 
-    private void SetPayment(bool payedOrNot, Order order)
+    private async Task SetPayment(bool payedOrNot, Order order)
     {
-        orderRepo.SetPayment(payedOrNot, order);
+        await orderRepo.SetPayment(payedOrNot, order);
     }
 
     private async Task DoneAddingItems()
     {
         avoidDuplicate = false;
         readyOrderLines = false;
-        prepNewOrder = new Order();
+        doneBool = false;
         await orderRepo.DeleteNoItemsOrders();
     }
 
@@ -354,20 +350,15 @@ else
     {
         if (seeItemsInOrder == true && seeInOrder == closeOpenSeeItems) //gör så att vi kan klicka på knappen igen och fönstret stänger
         {
-
             seeItemsInOrder = false;
-
         }
         else
         {
             closeOpenSeeItems = seeInOrder;
-
             seeItemsInOrder = true;
             seeMyItems = seeInOrder;
             seeMyItemsSpec = prepareOrderLine.Where(b => b.Order == seeInOrder).ToList();
-
         }
-
     }
 
     public string FilterFunction { get; set; }
