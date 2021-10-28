@@ -220,7 +220,7 @@ else
         prepareOrderLine = await orderRepo.GetOrderLinesAsync();
         displayCustomers = await customerRepo.GetCustomersAsync();
         displayProducts = await productRepo.GetProductsAsync();
-        orderRepo.deleteNoItemsOrders();
+        await orderRepo.DeleteNoItemsOrders();
     }
 
 

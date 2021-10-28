@@ -35,63 +35,49 @@ namespace ProductCatalogueApplication.Data
         public async Task AddNewOrder(Order newOrder)
         {
             newOrder.OrderDate = DateTime.Now;
-            newOrder.Customer = await _context.Customers.Where(ol => ol.Id == newOrder.CustomerId).FirstOrDefaultAsync(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
-            await _context.Orders.AddAsync(newOrder);
+            newOrder.Customer = _context.Customers.Where(ol => ol.Id == newOrder.CustomerId).FirstOrDefault(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
+            _context.Orders.Add(newOrder);
             await _context.SaveChangesAsync();
         }
 
         public async Task AddNewOrderLine(OrderLine newOrderLine, Order OrderToMatch)
         {
             newOrderLine.OrderId = OrderToMatch.Id;
-            newOrderLine.Order = await _context.Orders.Where(ol => ol.Id == newOrderLine.OrderId).FirstOrDefaultAsync();
+            newOrderLine.Order = _context.Orders.Where(ol => ol.Id == newOrderLine.OrderId).FirstOrDefault();
 
-            newOrderLine.Product = await _context.Products.Where(ol => ol.Id == newOrderLine.ProductId).FirstOrDefaultAsync(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
+            newOrderLine.Product = _context.Products.Where(ol => ol.Id == newOrderLine.ProductId).FirstOrDefault(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
 
-            bool noDuplicateProduct = true; //bool som sätts till false ifall produkten redan existerar i ordern
-
-            foreach (OrderLine ol in OrderToMatch.Items) //kollar alla orderlines i ordern
-            {
-                if (ol.Product == newOrderLine.Product) //jämför orderlinens produkt med den nya produkten
-                {
-                    ol.Quantity += newOrderLine.Quantity; //ifall produkten redan finns i ordern adderas den nya kvantiteten till den ordinarie orderlinen
-                    noDuplicateProduct = false;
-                    await _context.SaveChangesAsync();
-                }
-            }
-            if (noDuplicateProduct == true) //om produkten inte fanns med i ordern skapas en ny orderline med den nya produkten
-            {
-                await _context.OrderLines.AddAsync(newOrderLine);
-            }
+            _context.OrderLines.Add(newOrderLine);
             await _context.SaveChangesAsync();
         }
 
-        public void BatchAndProcess(List<Order> allOrders)
+        public async Task BatchAndProcess(List<Order> allOrders)
         {
-            ProcessOrders(allOrders);
-            ResetRestockDays(allOrders);
+            await ProcessOrders(allOrders);
+            await ResetRestockDays(allOrders);
         }
 
 
-        public void AddMoreStock(Product giveItMoreStock, int neededStock)
+        public async Task AddMoreStock(Product giveItMoreStock, int neededStock)
         {
             //Vi har n�tt dagen d� stock kommer in och vi r�knar d� hur mycket som ska in kanske inte super realistiskt eftersom r�kningen borde ske innan men finns ingen s�n egenskap i databasen
             giveItMoreStock.Stock = giveItMoreStock.Stock + neededStock + 20; //lägger även in 20 extra.
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
-        public void UpdateOrder(Order specOrder)
+        public async Task UpdateOrder(Order specOrder)
         {
             _context.Orders.Update(specOrder);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             
         }
-        public void DeleteItem(OrderLine toBeDeleted)
+        public async Task DeleteItem(OrderLine toBeDeleted)
         {
             _context.OrderLines.Remove(toBeDeleted);
             if(toBeDeleted.Order.Items.Count() == 1) //vi raderar hela ordern om inga items finnsinuti
             {
                 _context.Orders.Remove(toBeDeleted.Order);
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
         public async Task<List<Order>> DisplayArchivedCustomerOrder(Customer customer)
@@ -104,7 +90,7 @@ namespace ProductCatalogueApplication.Data
             return await _context.Orders.Where(o => o.Dispatched == false && customer.Id == o.CustomerId).ToListAsync();
         }
 
-        public void SetPayment(bool payedOrNot, Order order)
+        public async Task SetPayment(bool payedOrNot, Order order)
         {
             if (payedOrNot == false)
             {
@@ -114,10 +100,10 @@ namespace ProductCatalogueApplication.Data
             {
                 order.PaymentCompleted = false;
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
         
-        public void deleteNoItemsOrders() //vi har en funktion f�r att ta bort ordrar som inte har n�gra items eftersom de inte d� fyller n�gon funktion och kan st�ka till i Databasen
+        public async Task DeleteNoItemsOrders() //vi har en funktion f�r att ta bort ordrar som inte har n�gra items eftersom de inte d� fyller n�gon funktion och kan st�ka till i Databasen
         {
             List<Order> noItemsOrders = new List<Order>();
             noItemsOrders = _context.Orders.Where(b => b.Items.Count() == 0).ToList();
@@ -125,7 +111,7 @@ namespace ProductCatalogueApplication.Data
             {
                 _context.Orders.Remove(or);
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
         public async Task<List<Order>> GetDispatched()
         {
@@ -163,67 +149,66 @@ namespace ProductCatalogueApplication.Data
             return filtered;
         }
 
-
         /** 
          ** Helper methods for Batch & Process
          **/
 
-        private void ProcessOrders(List<Order> allOrders)
+        private async Task ProcessOrders(List<Order> allOrders)
         {
             bool dispatchWholeOrder = true;
             List<int> stocksToReturn = new List<int>();
             List<Order> sortedByLongest = allOrders
-                .Where(b => b.Dispatched == false)
+                .Where(b => b.Dispatched == false && b.PaymentCompleted == true)
                 .OrderBy(b => b.OrderDate)
                 .ToList();
 
             foreach (Order ord in sortedByLongest)
             {
                 stocksToReturn.Clear();
-                List<OrderLine> checkProducts = _context.OrderLines.Where(ol => ol.OrderId == ord.Id).ToList();
+                List<OrderLine> checkProducts = await _context.OrderLines.Where(ol => ol.OrderId == ord.Id).ToListAsync();
 
                 foreach (OrderLine ordLine in checkProducts)
                 {
-                    Product checkProduct = _context.Products.Where(ol => ol.Id == ordLine.ProductId).FirstOrDefault();
+                    Product checkProduct = await _context.Products.Where(ol => ol.Id == ordLine.ProductId).FirstOrDefaultAsync();
 
-                    int stockQuantity = GetProcessedOrderQuantity(ord, ordLine, checkProduct);
+                    int stockQuantity = await GetProcessedOrderQuantity(ordLine, checkProduct);
                     stocksToReturn.Add(stockQuantity);
                     dispatchWholeOrder = stockQuantity != 0;
                 }
 
-                BatchOrders(dispatchWholeOrder, ord, checkProducts, stocksToReturn);
+                 BatchOrders(dispatchWholeOrder, ord, checkProducts, stocksToReturn);
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        private int GetProcessedOrderQuantity(Order ord, OrderLine takenQuantity, Product prod)
+        private async Task<int> GetProcessedOrderQuantity(OrderLine takenQuantity, Product prod)
         {
-            if (prod.Stock - takenQuantity.Quantity >= 0) // vi kollar om stock r�cker
+            if (prod.Stock - takenQuantity.Quantity >= 0)
             {
                 prod.Stock -= takenQuantity.Quantity;
                 return takenQuantity.Quantity;
             }
-            else //stock r�cker inte s� vi kollar p� restock date
+            else
             {
-                return GetStockedProductAndQuantityNumber(takenQuantity, prod);
+                return await GetStockedProductAndQuantityNumber(takenQuantity, prod);
             }
         }
 
-        private int GetStockedProductAndQuantityNumber(OrderLine takenQuantity, Product prod)
+        private async Task<int> GetStockedProductAndQuantityNumber(OrderLine takenQuantity, Product prod)
         {
-            if (prod.RestockingDate.ToString().Equals("0001-01-01 00:00:00")) //betyder att den inte har ett restocking date och vi s�tter ett
+            if (prod.RestockingDate.ToString().Equals("0001-01-01 00:00:00"))
             {
                 prod.RestockingDate = DateTime.Now.AddDays(10);
                 return 0;
             }
-            else //vi har ett restockdate, om det �r nu s� kan vi restocka, annars v�ntar vi
+            else 
             {
-                if (DateTime.Now >= prod.RestockingDate) //vi har n�tt Restocking Date och fyller p� med s� m�nga som beh�vs samt skickar iv�g ordern
+                if (DateTime.Now >= prod.RestockingDate) 
                 {
                     int neededStock = prod.Stock - takenQuantity.Quantity;
                     neededStock = Math.Abs(neededStock);
-                    AddMoreStock(prod, neededStock); //vi addar s� mcyket som beh�vs
-                    prod.Stock -= takenQuantity.Quantity;  //ANDRA SCENARIOT D� EN ORDERLINE �R OK
+                    await AddMoreStock(prod, neededStock);
+                    prod.Stock -= takenQuantity.Quantity; 
 
                     return takenQuantity.Quantity;
                 }
@@ -236,14 +221,14 @@ namespace ProductCatalogueApplication.Data
 
         private void BatchOrders(bool dispatchWholeOrder, Order ord, List<OrderLine> checkProducts, List<int> stockList)
         {
-            if (dispatchWholeOrder == true && ord.PaymentCompleted == true)
+            if (dispatchWholeOrder == true)
             {
                 ord.Dispatched = true;
             }
-            else if (dispatchWholeOrder == false)
+            else
             {
                 int counter = 0;
-                foreach (OrderLine ordLine2 in checkProducts)
+                 foreach (OrderLine ordLine2 in checkProducts)
                 {
                     ordLine2.Product.Stock = ordLine2.Product.Stock + stockList[counter];
                     counter++;
@@ -251,7 +236,7 @@ namespace ProductCatalogueApplication.Data
             }
         }
 
-        private void ResetRestockDays(List<Order> resetRestockDays)
+        private async Task ResetRestockDays(List<Order> resetRestockDays)
         {
             foreach (Order rest in resetRestockDays)
             {
@@ -266,7 +251,7 @@ namespace ProductCatalogueApplication.Data
                     }
                 }
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
     }
