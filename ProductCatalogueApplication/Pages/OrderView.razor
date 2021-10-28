@@ -22,47 +22,61 @@
         <button class="btn btn-info" type="submit">Update Order</button>
     </EditForm>
 }
+else if (readyOrderLines == true)
+{
+<h4>Choose what items to include in the order</h4>
+<EditForm Model="@prepNewOrderLine" OnValidSubmit="(() => NewOrderAndOrderLines(prepNewOrder, prepNewOrderLine))">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <label for="product">Product</label>
+    <InputSelectNumber id="product" @bind-Value="@prepNewOrderLine.ProductId">
+        @foreach (Product prod in displayProducts)
+        {
+            <option value="@prod.Id"> @prod.Name {@prod.Price $} </option>
+        }
+    </InputSelectNumber>
+    <div class="form-group">
+        <label for="quantity"> Quantity </label>
+        <input @bind-value="@prepNewOrderLine.Quantity" type="number" />
+    </div>
+    @if (prepNewOrderLine.ProductId != 0)
+    {
+        <button class="btn btn-outline-secondary" type="submit">Add item to your current order</button>
+    }
+</EditForm>
+    if (doneBool == true)
+    {
+<button id="done" class="btn btn-warning" @onclick="() => DoneAddingItems()">Done adding items?</button>
+        doneBool = false;
+    }
+}
+
 else
 {
-    <h3>Add a new order and choose what items to include</h3>
-    <EditForm Model="@prepNewOrder" OnValidSubmit="(() => PrepareNewOrder(prepNewOrder))">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <div class="form-group">
-            <label for="adress">Delivery Adress</label>
-            <input @bind-value="@prepNewOrder.DeliveryAdress" type="text" />
-        </div>
-        <label for="customer"> Customer </label>
-        <InputSelectNumber id="customer" @bind-Value="@prepNewOrder.CustomerId">
-            @foreach (Customer cust in displayCustomers)
-                {
-                <option value="@cust.Id"> @cust.Name {@cust.Id} </option>
-                }
-        </InputSelectNumber>
+<h3>Add a new order and choose what items to include</h3>
+<EditForm Model="@prepNewOrder" OnValidSubmit="(() => PrepareNewOrder(prepNewOrder))">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="adress">Delivery Adress</label>
+        <input @bind-value="@prepNewOrder.DeliveryAdress" type="text" />
+    </div>
+    <label for="customer"> Customer </label>
+    <InputSelectNumber id="customer" @bind-Value="@prepNewOrder.CustomerId">
+        @foreach (Customer cust in displayCustomers)
+        {
+            <option value="@cust.Id"> @cust.Name {@cust.Id} </option>
+        }
+        /**/
+        /**/
+    </InputSelectNumber>
+    @if (prepNewOrder.CustomerId != 0)
+    {
         <button class="btn btn-success" type="submit"> Add Order </button>
-    </EditForm>
+    }
+</EditForm>
 }
-@if (readyOrderLines)
-{
-    <h4>Choose what items to include in the order</h4>
-    <EditForm Model="@prepNewOrderLine" OnValidSubmit="(() => NewOrderAndOrderLines(prepNewOrder, prepNewOrderLine))">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <label for="product">Product</label>
-        <InputSelectNumber id="product" @bind-Value="@prepNewOrderLine.ProductId">
-            @foreach (Product prod in displayProducts)
-                {
-                <option value="@prod.Id"> @prod.Name {@prod.Price $} </option>
-                }
-        </InputSelectNumber>
-        <div class="form-group">
-            <label for="quantity"> Quantity </label>
-            <input @bind-value="@prepNewOrderLine.Quantity" type="number" />
-        </div>
-        <button class="btn btn-outline-secondary" type="submit">Add item to your current order</button>
-    </EditForm>
-    <button class="btn btn-warning" @onclick="() => DoneAddingItems()">Done adding items?</button>
-}
+
 
 <h3>Current orders</h3>
 <div class="row bg-light">
@@ -177,17 +191,18 @@ else
     </div>
 }
 @code{
-        //Order updateOrder = new Order();
+    //Order updateOrder = new Order();
 
 
-        Order prepNewOrder = new Order();
-        OrderLine prepNewOrderLine = new OrderLine();
+    Order prepNewOrder = new Order();
+    OrderLine prepNewOrderLine = new OrderLine();
 
     private bool IsUpdating = false;
     bool avoidDuplicate = false;
     bool readyOrderLines = false;
     bool seeItemsInOrder = false;
     bool firstOrderLine = false;
+    bool doneBool = false;
     Order seeMyItems;
     List<OrderLine> seeMyItemsSpec;
 
@@ -271,6 +286,7 @@ else
             prepareOrderLine.Add(orderLineItem);
             await PrepareNewOrderLine(orderLineItem);
         }
+        doneBool = true;
     }
 
 
