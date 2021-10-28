@@ -35,19 +35,33 @@ namespace ProductCatalogueApplication.Data
         public async Task AddNewOrder(Order newOrder)
         {
             newOrder.OrderDate = DateTime.Now;
-            newOrder.Customer = _context.Customers.Where(ol => ol.Id == newOrder.CustomerId).FirstOrDefault(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
-            _context.Orders.Add(newOrder);
+            newOrder.Customer = await _context.Customers.Where(ol => ol.Id == newOrder.CustomerId).FirstOrDefaultAsync(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
+            await _context.Orders.AddAsync(newOrder);
             await _context.SaveChangesAsync();
         }
 
         public async Task AddNewOrderLine(OrderLine newOrderLine, Order OrderToMatch)
         {
             newOrderLine.OrderId = OrderToMatch.Id;
-            newOrderLine.Order = _context.Orders.Where(ol => ol.Id == newOrderLine.OrderId).FirstOrDefault();
+            newOrderLine.Order = await _context.Orders.Where(ol => ol.Id == newOrderLine.OrderId).FirstOrDefaultAsync();
 
-            newOrderLine.Product = _context.Products.Where(ol => ol.Id == newOrderLine.ProductId).FirstOrDefault(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
+            newOrderLine.Product = await _context.Products.Where(ol => ol.Id == newOrderLine.ProductId).FirstOrDefaultAsync(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
 
-            _context.OrderLines.Add(newOrderLine);
+            bool noDuplicateProduct = true;
+
+            foreach (OrderLine ol in OrderToMatch.Items)
+            {
+                if (ol.Product == newOrderLine.Product)
+                {
+                    ol.Quantity += newOrderLine.Quantity;
+                    noDuplicateProduct = false;
+                    await _context.SaveChangesAsync();
+                }
+            }
+            if (noDuplicateProduct == true)
+            {
+                await _context.OrderLines.AddAsync(newOrderLine);
+            }
             await _context.SaveChangesAsync();
         }
 
@@ -118,15 +132,6 @@ namespace ProductCatalogueApplication.Data
             return await _context.Orders.Where(ord => ord.Dispatched == true).ToListAsync();
         }
 
-        /*
-        public List<Order> GetDispatched1(List<Order> allOrders)
-        {
-            List<Order> filtered = new List<Order>();
-
-            filtered = allOrders.Where(b => b.Dispatched == true).ToList();
-
-            return filtered;
-        }*/
         public async Task <List<Order>> GetPending()
         {
             List<Order> filtered = new List<Order>();
@@ -157,35 +162,6 @@ namespace ProductCatalogueApplication.Data
 
             return filtered;
         }
-
-        /*public List<Order> GetPending1(List<Order> allOrders)
-        {
-            List<Order> filtered = new List<Order>();
-            List<OrderLine> shortestRestockDateOL = new List<OrderLine>();
-            List<OrderLine> getPending = new List<OrderLine>();
-            Product checkPro = new Product();
-
-            filtered = allOrders.Where(b => b.Dispatched == false).ToList();
-            foreach (Order ord in filtered)
-            {
-                getPending = _context.OrderLines.Where(ol => ol.OrderId == ord.Id).ToList();
-                shortestRestockDateOL.AddRange(getPending);
-            }
-            shortestRestockDateOL = shortestRestockDateOL.OrderByDescending(s => s.Product.RestockingDate).ToList(); //får en lista av orderlines där vi sorterar utefter restockDate
-                                                                                                                     //LÄGG in så att filtered är sorterade utefter restockDate
-            List<Order> filtered2 = new List<Order>();
-            foreach (OrderLine ordLine in shortestRestockDateOL) //filtrering så att vi får orders sorterade efter deras restocking date, eftersom orderlines med kortast restocking date kommer först i ordLine
-            {
-                Order filteredOrder = allOrders.Where(o => o.Id == ordLine.OrderId).FirstOrDefault(); //Vi skapar en order för varje orderline
-                filtered2.Add(filteredOrder);
-
-
-            }
-            filtered2 = filtered2.Distinct().ToList();
-            filtered = filtered2;
-
-            return filtered;
-        }*/
 
 
         /** 
