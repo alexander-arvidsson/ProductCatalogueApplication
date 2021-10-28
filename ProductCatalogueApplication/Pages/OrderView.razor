@@ -254,13 +254,13 @@ else
         prepNewOrder = bindToOrder;
     }
 
-    private void PrepareNewOrder(Order prepareForOrder) //////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
+    private async Task PrepareNewOrder(Order prepareForOrder) //////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
     {
         //en order måste ha en kund, om den inte finns så kan den inte skapas
         //placeOrder = true;
         readyOrderLines = true;
 
-        orderRepo.AddNewOrder(prepareForOrder); //lägger till okbjektet
+        await orderRepo.AddNewOrder(prepareForOrder); //lägger till okbjektet
                                                 //activeOrders.Add(o); //lägger till i denna lista tillfälligt för att göra så att vi kan gå vidare till orderlines
 
     }
@@ -289,19 +289,19 @@ else
     Order closeOpenSeeItems = new Order();
     Order closeOpenUpdateOrder = new Order();
 
-    private void ProcessBatchorders(List<Order> allOrders)
+    private async Task ProcessBatchorders(List<Order> allOrders)
     {
-        orderRepo.BatchAndProcess(allOrders);
+        await orderRepo.BatchAndProcess(allOrders);
 
     }
-    private void UpdateOrder()
+    private async Task UpdateOrder()
     {
-        orderRepo.UpdateOrder(updatedOrder);
+        await orderRepo.UpdateOrder(updatedOrder);
         IsUpdating = false;
     }
 
 
-    private void DeleteItem(OrderLine itemToBeDeleted)
+    private async Task DeleteItem(OrderLine itemToBeDeleted)
     {
         if (seeMyItemsSpec != null)
         {
@@ -314,7 +314,7 @@ else
             seeItemsInOrder = false;
 
         }
-        orderRepo.DeleteItem(itemToBeDeleted);
+        await orderRepo.DeleteItem(itemToBeDeleted);
 
     }
     private void SetForUpdate(Order selectedOrder)
@@ -333,9 +333,9 @@ else
 
     }
 
-    private void SetPayment(bool payedOrNot, Order order)
+    private async Task SetPayment(bool payedOrNot, Order order)
     {
-        orderRepo.SetPayment(payedOrNot, order);
+        await orderRepo.SetPayment(payedOrNot, order);
     }
 
     private async Task DoneAddingItems()
@@ -350,20 +350,15 @@ else
     {
         if (seeItemsInOrder == true && seeInOrder == closeOpenSeeItems) //gör så att vi kan klicka på knappen igen och fönstret stänger
         {
-
             seeItemsInOrder = false;
-
         }
         else
         {
             closeOpenSeeItems = seeInOrder;
-
             seeItemsInOrder = true;
             seeMyItems = seeInOrder;
             seeMyItemsSpec = prepareOrderLine.Where(b => b.Order == seeInOrder).ToList();
-
         }
-
     }
 
     public string FilterFunction { get; set; }
