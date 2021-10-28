@@ -36,7 +36,7 @@ namespace ProductCatalogueApplication.Data
         /// <returns>No return value in async task method</returns>
         public async Task AddProduct(Product p)
         {
-            _context.Products.Add(p);
+            await _context.Products.AddAsync(p);
             await _context.SaveChangesAsync();
         }
 
