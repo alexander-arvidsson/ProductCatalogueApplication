@@ -25,7 +25,7 @@ namespace ProductCatalogueApplication.Data.Interfaces
         Task<List<Order>> GetOrdersAsync();
 
         /// <summary>
-        /// Method to get all the orders matched with a customer id in a list.
+        /// Method to get all the orders matched with an id in a list.
         /// </summary>
         Task<List<Order>> GetOrdersAsync(int id);
 
@@ -55,17 +55,17 @@ namespace ProductCatalogueApplication.Data.Interfaces
         Task AddMoreStock(Product giveProStock, int neededStock);
 
         /// <summary>
-        /// 
+        /// Method to list all the dispatched orders.
         /// </summary>
         Task<List<Order>> GetDispatched();
 
         /// <summary>
-        /// 
+        /// Method to list all the undispatched orders.
         /// </summary>
         Task<List<Order>> GetPending();
 
         /// <summary>
-        /// 
+        /// Method to switch the value of a paid or unpaid order.
         /// </summary>
         Task SetPayment(bool payedOrNot, Order order);
 

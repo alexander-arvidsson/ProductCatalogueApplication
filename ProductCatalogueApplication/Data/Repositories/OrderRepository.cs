@@ -162,7 +162,7 @@ namespace ProductCatalogueApplication.Data
         }
 
         /// <summary>
-        /// A method that checks if a payment is false....
+        /// A method that switches the boolean value of the payment from false to true and vice versa.
         /// </summary>
         /// <param name="payedOrNot">a bool that's true if paid, false if not payed</param>
         /// <param name="order">An order object</param>
@@ -181,7 +181,7 @@ namespace ProductCatalogueApplication.Data
         }
 
         /// <summary>
-        /// A mthod that deletes orders with 0 items in it.
+        /// A method that deletes orders with 0 items in it.
         /// </summary>
         /// <returns>Nothing because of async Task method</returns>
         public async Task DeleteNoItemsOrders()
@@ -196,9 +196,9 @@ namespace ProductCatalogueApplication.Data
         }
 
         /// <summary>
-        /// 
+        /// A method that finds all the dispatched orders.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A list of all the dispatched orders.</returns>
         public async Task<List<Order>> GetDispatched()
         {
             return await _context.Orders.Where(ord => ord.Dispatched == true).ToListAsync();
