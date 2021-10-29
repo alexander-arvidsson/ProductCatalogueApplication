@@ -7,19 +7,29 @@ namespace ProductCatalogueApplication.Data.Interfaces
 {
     interface IProductRepository
     {
-        //Metod för att få alla produkter till en lista.
+        /// <summary>
+        /// Method to get all the products in a list.
+        /// </summary>
         Task<List<Product>> GetProductsAsync();
 
-        //Metod för att lägga in en produkt.
+        /// <summary>
+        /// Method for adding a product.
+        /// </summary>
         Task AddProduct(Product p);
 
-        //Metod för att ta bort en produkt.
+        /// <summary>
+        /// Method for deleting a product.
+        /// </summary>
         Task RemoveProduct(Product p);
 
-        //Metod för att uppdatera en produkt.
+        /// <summary>
+        /// Method for updating a product
+        /// </summary>
         Task UpdateProduct(Product p);
 
-        //Metod som genererar en lista med alla produkter utan någon stock.
+        /// <summary>
+        /// Method that generates a list of products without stock.
+        /// </summary>
         Task<List<Product>> DisplayZeroStockAsync();
     }
 }

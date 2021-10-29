@@ -27,7 +27,7 @@ namespace ProductCatalogueApplication.Data
         }
 
         /// <summary>
-        /// A method that matches a customerID to an order from the database.
+        /// A method that matches customerID to orders from the database.
         /// </summary>
         /// <param name="id">The customer ID</param>
         /// <returns>All customerIDs with orders linked to them.</returns>
@@ -39,7 +39,7 @@ namespace ProductCatalogueApplication.Data
         /// <summary>
         /// A method that gets the list of orderlines from the database.
         /// </summary>
-        /// <returns>Order-list</returns>
+        /// <returns>Orderline-list</returns>
         public async Task<List<OrderLine>> GetOrderLinesAsync()
         {
             return await _context.OrderLines.ToListAsync();
@@ -48,7 +48,7 @@ namespace ProductCatalogueApplication.Data
         /// <summary>
         /// A method that adds a new order linked to a customer ID.
         /// </summary>
-        /// <param name="newOrder">A new object from the Order class.</param>
+        /// <param name="newOrder">An object from the Order class.</param>
         /// <returns>No return because of async task method</returns>
         public async Task AddNewOrder(Order newOrder)
         {
@@ -63,8 +63,8 @@ namespace ProductCatalogueApplication.Data
         /// If the product already exists in the order then the number of the same product added will be added to the quantity.
         /// If not then a new orderline of that product will simply be added.
         /// </summary>
-        /// <param name="newOrderLine">A new object from the OrderLine class.</param>
-        /// <param name="OrderToMatch">A new object from the Order class???</param>
+        /// <param name="newOrderLine">An object from the OrderLine class.</param>
+        /// <param name="OrderToMatch">An object from the Order class</param>
         /// <returns>No return because of async task method</returns>
         public async Task AddNewOrderLine(OrderLine newOrderLine, Order OrderToMatch)
         {
@@ -152,21 +152,21 @@ namespace ProductCatalogueApplication.Data
         }
 
         /// <summary>
-        /// 
+        /// A method that displayes all the undispatched customer orders.
         /// </summary>
-        /// <param name="customer"></param>
-        /// <returns></returns>
+        /// <param name="customer">A customer object</param>
+        /// <returns>A list of all the undispatched customer orders</returns>
         public async Task<List<Order>> DisplayActiveCustomerOrder(Customer customer)
         {
             return await _context.Orders.Where(o => o.Dispatched == false && customer.Id == o.CustomerId).ToListAsync();
         }
 
         /// <summary>
-        /// 
+        /// A method that checks if a payment is false....
         /// </summary>
-        /// <param name="payedOrNot"></param>
-        /// <param name="order"></param>
-        /// <returns></returns>
+        /// <param name="payedOrNot">a bool that's true if paid, false if not payed</param>
+        /// <param name="order">An order object</param>
+        /// <returns>Nothing because of async Task method type</returns>
         public async Task SetPayment(bool payedOrNot, Order order)
         {
             if (payedOrNot == false)
@@ -181,9 +181,9 @@ namespace ProductCatalogueApplication.Data
         }
 
         /// <summary>
-        /// 
+        /// A mthod that deletes orders with 0 items in it.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Nothing because of async Task method</returns>
         public async Task DeleteNoItemsOrders()
         {
             List<Order> noItemsOrders = new List<Order>();
@@ -205,9 +205,10 @@ namespace ProductCatalogueApplication.Data
         }
 
         /// <summary>
-        /// 
+        /// A method that filters out all the undispatched orders and then checks each order and sorts
+        /// them on which orderline has the shortest restocking date.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The filtered list of undispatched orders</returns>
         public async Task <List<Order>> GetPending()
         {
             List<Order> filtered = new List<Order>();
