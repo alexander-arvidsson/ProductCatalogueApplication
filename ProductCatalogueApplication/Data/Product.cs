@@ -24,9 +24,8 @@ namespace ProductCatalogueApplication.Data
             set { _id = value; }
         }
 
-        [Required(ErrorMessage = "A product name is required.")] //Längden måste vara minst 1 tecken och max 30.
+        [Required(ErrorMessage = "A product name is required.")]
         [StringLength(30, ErrorMessage = " {0} length must be between {2} and {1}.", MinimumLength = 1)]
-
         /// <summary>
         /// The product name saved as a string.
         /// </summary>
@@ -46,30 +45,21 @@ namespace ProductCatalogueApplication.Data
             set { _description = value; }
         }
 
-        //Tror inte vi behöver dessa
-        [Required(ErrorMessage = "A price is required.")]
-
         /// <summary>
         /// The product price saved as a double.
         /// </summary>
 
-        [Range(0, double.MaxValue, ErrorMessage ="{0} can not be a negative value")] //Priset behöver vara minst 0
-
+        [Range(0, double.MaxValue, ErrorMessage ="{0} can not be a negative value")]
         public double Price
         {
             get { return _price; }
             set { _price = value; }
         }
 
-        //Tror inte vi behöver dessa
-        [Required(ErrorMessage = "A stock is required.")]
-
         /// <summary>
         /// The product stock number saved as an int.
         /// </summary>
-
-        [Range(0, 9999, ErrorMessage = " {0} can not be a negative value or more than 9999")] //tog bara ett random värde som säger att vi inte kan gå under 0 i stock eller över 9999
-
+        [Range(0, 9999, ErrorMessage = " {0} can not be a negative value or more than 9999")]
         public int Stock
         {
             get { return _stock; }

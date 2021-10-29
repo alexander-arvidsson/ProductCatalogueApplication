@@ -53,7 +53,7 @@ namespace ProductCatalogueApplication.Data
         public async Task AddNewOrder(Order newOrder)
         {
             newOrder.OrderDate = DateTime.Now;
-            newOrder.Customer = await _context.Customers.Where(ol => ol.Id == newOrder.CustomerId).FirstOrDefaultAsync(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
+            newOrder.Customer = await _context.Customers.Where(ol => ol.Id == newOrder.CustomerId).FirstOrDefaultAsync();
             await _context.Orders.AddAsync(newOrder);
             await _context.SaveChangesAsync();
         }
@@ -71,20 +71,20 @@ namespace ProductCatalogueApplication.Data
             newOrderLine.OrderId = OrderToMatch.Id;
             newOrderLine.Order = await _context.Orders.Where(ol => ol.Id == newOrderLine.OrderId).FirstOrDefaultAsync();
 
-            newOrderLine.Product = await _context.Products.Where(ol => ol.Id == newOrderLine.ProductId).FirstOrDefaultAsync(); //vi hittar v?ran customer fr?n att vi s?ker efter customerId
+            newOrderLine.Product = await _context.Products.Where(ol => ol.Id == newOrderLine.ProductId).FirstOrDefaultAsync();
 
-            bool noDuplicateProduct = true; //bool som sätts till false ifall produkten redan existerar i ordern
+            bool noDuplicateProduct = true; //Bool that becomes false if the product already exists in the order.
 
-            foreach (OrderLine ol in OrderToMatch.Items) //kollar alla orderlines i ordern
+            foreach (OrderLine ol in OrderToMatch.Items)
             {
-                if (ol.Product == newOrderLine.Product) //jämför orderlinens produkt med den nya produkten
+                if (ol.Product == newOrderLine.Product)
                 {
-                    ol.Quantity += newOrderLine.Quantity; //ifall produkten redan finns i ordern adderas den nya kvantiteten till den ordinarie orderlinen
+                    ol.Quantity += newOrderLine.Quantity; //If the product already exists in the order, the quantity is added.
                     noDuplicateProduct = false;
                     await _context.SaveChangesAsync();
                 }
             }
-            if (noDuplicateProduct == true) //om produkten inte fanns med i ordern skapas en ny orderline med den nya produkten
+            if (noDuplicateProduct == true) //If the product doesn't exist in the order, a new product is added.
             {
                 await _context.OrderLines.AddAsync(newOrderLine);
             }
@@ -92,7 +92,7 @@ namespace ProductCatalogueApplication.Data
         }
 
         /// <summary>
-        /// A method that processes all the dispatchable orders and resets the restocking date to a default value.
+        /// A method that processes all the pending orders and resets the restocking date to a default value.
         /// </summary>
         /// <param name="allOrders">A list of all the orders stored in the database</param>
         /// <returns>No return because of async task method</returns>
@@ -110,7 +110,7 @@ namespace ProductCatalogueApplication.Data
         /// <returns>No return because of async task method</returns>
         public async Task AddMoreStock(Product giveItMoreStock, int neededStock)
         {
-            giveItMoreStock.Stock = giveItMoreStock.Stock + neededStock + 20; //lägger även in 20 extra.
+            giveItMoreStock.Stock = giveItMoreStock.Stock + neededStock + 20; //Also adds 20 extra stock for convenience.
             await _context.SaveChangesAsync();
         }
 
@@ -123,7 +123,6 @@ namespace ProductCatalogueApplication.Data
         {
             _context.Orders.Update(specOrder);
             await _context.SaveChangesAsync();
-            
         }
 
         /// <summary>
@@ -134,7 +133,7 @@ namespace ProductCatalogueApplication.Data
         public async Task DeleteItem(OrderLine toBeDeleted)
         {
             _context.OrderLines.Remove(toBeDeleted);
-            if(toBeDeleted.Order.Items.Count() == 1) //vi raderar hela ordern om inga items finnsinuti
+            if (toBeDeleted.Order.Items.Count() == 1)
             {
                 _context.Orders.Remove(toBeDeleted.Order);
             }
@@ -152,10 +151,10 @@ namespace ProductCatalogueApplication.Data
         }
 
         /// <summary>
-        /// A method that displayes all the undispatched customer orders.
+        /// A method that displayes all the pending customer orders.
         /// </summary>
         /// <param name="customer">A customer object</param>
-        /// <returns>A list of all the undispatched customer orders</returns>
+        /// <returns>A list of all the pending customer orders</returns>
         public async Task<List<Order>> DisplayActiveCustomerOrder(Customer customer)
         {
             return await _context.Orders.Where(o => o.Dispatched == false && customer.Id == o.CustomerId).ToListAsync();
@@ -205,11 +204,11 @@ namespace ProductCatalogueApplication.Data
         }
 
         /// <summary>
-        /// A method that filters out all the undispatched orders and then checks each order and sorts
-        /// them on which orderline has the shortest restocking date.
+        /// A method that filters out all the pending orders and then checks each order and sorts
+        /// them on which orderline has the shortest restocking date. The order with the closest restocking date will be at the top.
         /// </summary>
-        /// <returns>The filtered list of undispatched orders</returns>
-        public async Task <List<Order>> GetPending()
+        /// <returns>The filtered and sorted list of pending orders</returns>
+        public async Task<List<Order>> GetPending()
         {
             List<Order> filtered = new List<Order>();
             List<OrderLine> shortestRestockDateOL = new List<OrderLine>();
@@ -222,9 +221,9 @@ namespace ProductCatalogueApplication.Data
                 getPending = await _context.OrderLines.Where(ol => ol.OrderId == ord.Id).ToListAsync();
                 shortestRestockDateOL.AddRange(getPending);
             }
-            shortestRestockDateOL = shortestRestockDateOL.OrderByDescending(s => s.Product.RestockingDate).ToList(); //Sorterar alla ordelines så att det lägsta datumet kommer först
+            shortestRestockDateOL = shortestRestockDateOL.OrderByDescending(s => s.Product.RestockingDate).ToList(); //Sorts all orderlines by highest to lowest restock date.
 
-            foreach (OrderLine filtOrd in shortestRestockDateOL)
+            foreach (OrderLine filtOrd in shortestRestockDateOL) //We extract one order from every orderline but avoid duplicates.
             {
                 if (!unique.Contains(filtOrd.Order))
                 {
@@ -232,7 +231,7 @@ namespace ProductCatalogueApplication.Data
                 }
             }
             filtered = unique;
-            filtered.Reverse(); //Vi vill ha den order som snarast kan skickas högst upp i gui-listan
+            filtered.Reverse(); //We reverse the list so that the order with the closest restock date is at the top.
             return filtered;
         }
 
@@ -240,6 +239,7 @@ namespace ProductCatalogueApplication.Data
          ** Helper methods for Batch & Process
          **/
 
+        //Processes all orders, wether they are supposed to be dispatched or not.
         private async Task ProcessOrders(List<Order> allOrders)
         {
             bool dispatchWholeOrder = true;
@@ -263,11 +263,12 @@ namespace ProductCatalogueApplication.Data
                     dispatchWholeOrder = stockQuantity != 0;
                 }
 
-                 BatchOrders(dispatchWholeOrder, ord, checkProducts, stocksToReturn);
+                BatchOrders(dispatchWholeOrder, ord, checkProducts, stocksToReturn);
             }
             await _context.SaveChangesAsync();
         }
 
+        //Calculates wether there is enough stock for the orderline to be dispatched.
         private async Task<int> GetProcessedOrderQuantity(OrderLine takenQuantity, Product prod)
         {
             if (prod.Stock - takenQuantity.Quantity >= 0)
@@ -281,6 +282,7 @@ namespace ProductCatalogueApplication.Data
             }
         }
 
+        //Assigns restocking date and if the restocking date has arrived we return the stock required for the process.
         private async Task<int> GetStockedProductAndQuantityNumber(OrderLine takenQuantity, Product prod)
         {
             if (prod.RestockingDate.ToString().Equals("0001-01-01 00:00:00"))
@@ -288,14 +290,14 @@ namespace ProductCatalogueApplication.Data
                 prod.RestockingDate = DateTime.Now.AddDays(10);
                 return 0;
             }
-            else 
+            else
             {
-                if (DateTime.Now >= prod.RestockingDate) 
+                if (DateTime.Now >= prod.RestockingDate)
                 {
                     int neededStock = prod.Stock - takenQuantity.Quantity;
                     neededStock = Math.Abs(neededStock);
                     await AddMoreStock(prod, neededStock);
-                    prod.Stock -= takenQuantity.Quantity; 
+                    prod.Stock -= takenQuantity.Quantity;
 
                     return takenQuantity.Quantity;
                 }
@@ -306,7 +308,8 @@ namespace ProductCatalogueApplication.Data
             }
         }
 
-        private void BatchOrders(bool dispatchWholeOrder, Order ord, List<OrderLine> checkProducts, List<int> stockList)
+        //Checks if we can dispatch the order, if we can not dispatch the order the stock will be returned.
+        private void BatchOrders(bool dispatchWholeOrder, Order ord, List<OrderLine> itemsToReturn, List<int> stockList)
         {
             if (dispatchWholeOrder == true)
             {
@@ -315,7 +318,7 @@ namespace ProductCatalogueApplication.Data
             else
             {
                 int counter = 0;
-                 foreach (OrderLine ordLine2 in checkProducts)
+                foreach (OrderLine ordLine2 in itemsToReturn)
                 {
                     ordLine2.Product.Stock = ordLine2.Product.Stock + stockList[counter];
                     counter++;
@@ -323,6 +326,7 @@ namespace ProductCatalogueApplication.Data
             }
         }
 
+        //If restock date has arrived we reset the restock date.
         private async Task ResetRestockDays(List<Order> resetRestockDays)
         {
             foreach (Order rest in resetRestockDays)

@@ -150,6 +150,7 @@
     private Customer selectedCustomer;
     private bool IsUpdating;
     private bool IsInspecting;
+    private string FilterFunction { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -157,7 +158,6 @@
         IsInspecting = false;
     }
 
-   
     private async Task AddCustomer(Customer customer)
     {
         await customerRepo.AddCustomer(newCustomer);
@@ -177,7 +177,6 @@
         IsUpdating = false;
     }
 
-
     private void SelectToUpdate(Customer updated)
     {
         updateCustomer = updated;
@@ -195,7 +194,6 @@
         customerOrders = await orderRepo.GetOrdersAsync(customer.Id);
     }
 
-    public string FilterFunction { get; set; }
     private async void FilterGUI(Customer c)
     {
         switch (FilterFunction)
