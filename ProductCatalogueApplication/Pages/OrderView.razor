@@ -46,6 +46,7 @@ else if (readyOrderLines == true)
 </EditForm>
     if (doneBool == true)
     {
+        <p></p>
         <button id="done" class="btn btn-warning" @onclick="() => DoneAddingItems()">Done adding items?</button>
     }
 }
@@ -227,11 +228,14 @@ else
     {
         //gör en metod där jag gör en orderlist som är kopplad mot det tidigare prepOrder objektet
 
-        List<OrderLine> ordLine = seeMyItemsSpec.Where(p => p.ProductId == addOrderLine.ProductId).ToList();
-        if (!ordLine.Any())
+        if (seeMyItemsSpec != null)
         {
-            seeMyItemsSpec.Add(addOrderLine);
-        } 
+            List<OrderLine> ordLine = seeMyItemsSpec.Where(p => p.ProductId == addOrderLine.ProductId).ToList();
+            if (!ordLine.Any())
+            {
+                seeMyItemsSpec.Add(addOrderLine);
+            }
+        }
 
         await orderRepo.AddNewOrderLine(addOrderLine, prepNewOrder);
         prepNewOrderLine = new OrderLine();
@@ -276,9 +280,11 @@ else
         {
             displayOrders.Add(firstOrder);
         }
+
         prepareOrderLine.Add(orderLineItem);
         await PrepareNewOrderLine(orderLineItem);
         doneBool = true;
+        seeMyItemsSpec = prepareOrderLine.Where(b => b.Order == firstOrder).ToList();
     }
 
 
@@ -313,7 +319,6 @@ else
         {
             displayOrders.Remove(itemToBeDeleted.Order);
             seeItemsInOrder = false;
-
         }
         await orderRepo.DeleteItem(itemToBeDeleted);
 
