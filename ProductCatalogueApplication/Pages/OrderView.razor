@@ -84,11 +84,11 @@ else
         <thead class="thead-dark">
             <tr>
                 <th>Order ID</th>
-                <th>Customer ID</th>
+                <th>Customer</th>
                 <th>Delivery Adress</th>
                 <th>Dispatched</th>
                 <th>Order Date</th>
-                <th>Payment Completed</th>
+                <th>Payed</th>
                 <th>Nr of items</th>
                 <th class="bg-success">Update</th>
             </tr>
@@ -100,7 +100,7 @@ else
                 {
                     <tr>
                         <td>@b.Id</td>
-                        <td>@b.CustomerId</td>
+                        <td>@b.Customer.Name {@b.CustomerId}</td>
                         <td>@b.DeliveryAdress </td>
                         <td>@b.Dispatched</td>
                         <td>@b.OrderDate</td>
@@ -284,7 +284,7 @@ else
         prepareOrderLine.Add(orderLineItem);
         await PrepareNewOrderLine(orderLineItem);
         doneBool = true;
-        seeMyItemsSpec = prepareOrderLine.Where(b => b.Order == firstOrder).ToList();
+        seeMyItemsSpec = prepareOrderLine.Where(b => b.Order == firstOrder).ToList(); //uppdaterar items-listan i guin
     }
 
 

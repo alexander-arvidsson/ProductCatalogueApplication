@@ -17,11 +17,12 @@
     <table class="table table-bordered">
         <thead class="thead-dark">
             <tr>
-                <th>Product ID</th>
-                <th>Product Name</th>
-                <th>Product Price</th>
-                <th>Product Stock</th>
-                <th>Product Description</th>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Description</th>
+                <th>Restock Date</th>
                 <th>Delete Product</th>
                 <th>Update Product</th>
             </tr>
@@ -37,6 +38,7 @@
                         <td>@b.Price</td>
                         <td>@b.Stock</td>
                         <td>@b.Description</td>
+                        <td>@b.RestockingDate</td>
                         <td><button class="btn btn-danger" @onclick="(() => RemoveProduct(b))">Remove</button></td>
                         <td><button class="btn btn-outline-info" @onclick="(() => SetProductForUpdate(b))">Update</button></td>
                     </tr>

@@ -29,7 +29,7 @@ namespace ProductCatalogueApplication.Data
 
         
         [Required(ErrorMessage = "A name is required.")]        //[StringLength(20, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 3)]
-        [StringLength(20, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
+        [StringLength(30, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
 
         /// <summary>
         /// The customer name saved as a string.
@@ -54,7 +54,7 @@ namespace ProductCatalogueApplication.Data
         }
         
         [Required(ErrorMessage = "An email is required.")]
-        [StringLength(40, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
+        [StringLength(50, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
 
         /// <summary>
         /// The customer's email saved as a string.
