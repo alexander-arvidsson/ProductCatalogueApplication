@@ -213,29 +213,25 @@ namespace ProductCatalogueApplication.Data
             List<Order> filtered = new List<Order>();
             List<OrderLine> shortestRestockDateOL = new List<OrderLine>();
             List<OrderLine> getPending = new List<OrderLine>();
-            Product checkPro = new Product();
+            List<Order> unique = new List<Order>();
 
             filtered = await _context.Orders.Where(b => b.Dispatched == false).ToListAsync();
             foreach (Order ord in filtered)
             {
                 getPending = await _context.OrderLines.Where(ol => ol.OrderId == ord.Id).ToListAsync();
                 shortestRestockDateOL.AddRange(getPending);
-
             }
-            shortestRestockDateOL = shortestRestockDateOL.OrderByDescending(s => s.Product.RestockingDate).ToList(); //får en lista av orderlines där vi sorterar utefter restockDate
-                                                                                                                     //LÄGG in så att filtered är sorterade utefter restockDate
-            List<Order> filtered2 = new List<Order>();
-            foreach (OrderLine ordLine in shortestRestockDateOL) //filtrering så att vi får orders sorterade efter deras restocking date, eftersom orderlines med kortast restocking date kommer först i ordLine
+            shortestRestockDateOL = shortestRestockDateOL.OrderByDescending(s => s.Product.RestockingDate).ToList(); //Sorterar alla ordelines så att det lägsta datumet kommer först
+
+            foreach (OrderLine filtOrd in shortestRestockDateOL)
             {
-                Order filteredOrder = await _context.Orders.Where(o => o.Id == ordLine.OrderId).FirstOrDefaultAsync(); //Vi skapar en order för varje orderline
-                filtered2.Add(filteredOrder);
-
-
+                if (!unique.Contains(filtOrd.Order))
+                {
+                    unique.Add(filtOrd.Order);
+                }
             }
-            filtered2 = filtered2.Distinct().ToList();
-            filtered = filtered2;
-
-
+            filtered = unique;
+            filtered.Reverse(); //Vi vill ha den order som snarast kan skickas högst upp i gui-listan
             return filtered;
         }
 
