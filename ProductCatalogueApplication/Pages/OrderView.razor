@@ -24,26 +24,27 @@
 }
 else if (readyOrderLines == true)
 {
-<h4>Choose what items to include in the order</h4>
-<EditForm Model="@prepNewOrderLine" OnValidSubmit="(() => NewOrderAndOrderLines(prepNewOrder, prepNewOrderLine))">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <label for="product">Product</label>
-    <InputSelectNumber id="product" @bind-Value="@prepNewOrderLine.ProductId">
-        @foreach (Product prod in displayProducts)
+    <h4>Choose what items to include in the order</h4>
+    <EditForm Model="@prepNewOrderLine" OnValidSubmit="(() => NewOrderAndOrderLines(prepNewOrder, prepNewOrderLine))">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <label for="product">Product</label>
+        <InputSelectNumber id="product" @bind-Value="@prepNewOrderLine.ProductId">
+            @foreach (Product prod in displayProducts)
+                {
+                <option value="@prod.Id"> @prod.Name {@prod.Price $} </option>
+                }
+            /**/
+        </InputSelectNumber>
+        <div class="form-group">
+            <label for="quantity">Quantity</label>
+            <input @bind-value="@prepNewOrderLine.Quantity" type="number" />
+        </div>
+        @if (prepNewOrderLine.ProductId != 0)
         {
-            <option value="@prod.Id"> @prod.Name {@prod.Price $} </option>
+            <button class="btn btn-outline-secondary" type="submit">Add item to your current order</button>
         }
-    </InputSelectNumber>
-    <div class="form-group">
-        <label for="quantity">Quantity</label>
-        <input @bind-value="@prepNewOrderLine.Quantity" type="number" />
-    </div>
-    @if (prepNewOrderLine.ProductId != 0)
-    {
-        <button class="btn btn-outline-secondary" type="submit">Add item to your current order</button>
-    }
-</EditForm>
+    </EditForm>
     if (doneBool == true)
     {
         <p></p>
@@ -53,30 +54,30 @@ else if (readyOrderLines == true)
 
 else
 {
-<h3>Add a new order and choose what items to include</h3>
-<EditForm Model="@prepNewOrder" OnValidSubmit="(() => PrepareNewOrder(prepNewOrder))">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="form-group">
-        <label for="adress">Delivery Adress</label>
-        <input @bind-value="@prepNewOrder.DeliveryAdress" type="text" />
-    </div>
-    <label for="customer"> Customer </label>
-    <InputSelectNumber id="customer" @bind-Value="@prepNewOrder.CustomerId">
-        @foreach (Customer cust in displayCustomers)
+    <h3>Add a new order and choose what items to include</h3>
+    <EditForm Model="@prepNewOrder" OnValidSubmit="(() => PrepareNewOrder(prepNewOrder))">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="adress">Delivery Adress</label>
+            <input @bind-value="@prepNewOrder.DeliveryAdress" type="text" />
+        </div>
+        <label for="customer"> Customer </label>
+        <InputSelectNumber id="customer" @bind-Value="@prepNewOrder.CustomerId">
+            @foreach (Customer cust in displayCustomers)
+                {
+                <option value="@cust.Id"> @cust.Name {@cust.Id} </option>
+                }
+            /**/
+            /**/
+            /**/
+        </InputSelectNumber>
+        @if (prepNewOrder.CustomerId != 0)
         {
-            <option value="@cust.Id"> @cust.Name {@cust.Id} </option>
+            <button class="btn btn-success" type="submit"> Add Order </button>
         }
-        /**/
-        /**/
-    </InputSelectNumber>
-    @if (prepNewOrder.CustomerId != 0)
-    {
-        <button class="btn btn-success" type="submit"> Add Order </button>
-    }
-</EditForm>
+    </EditForm>
 }
-
 
 <h3>Current orders</h3>
 <div class="row bg-light">
@@ -191,26 +192,25 @@ else
     </div>
 }
 @code{
-    //Order updateOrder = new Order();
 
-
-    Order prepNewOrder = new Order();
-    OrderLine prepNewOrderLine = new OrderLine();
 
     private bool IsUpdating = false;
-    bool avoidDuplicate = false;
-    bool readyOrderLines = false;
-    bool seeItemsInOrder = false;
-    bool doneBool = false;
-    Order seeMyItems;
-    List<OrderLine> seeMyItemsSpec;
-
-    List<Customer> displayCustomers;
-    List<Product> displayProducts;
-
-    List<Order> displayOrders;
-    List<OrderLine> prepareOrderLine;
-
+    private bool avoidDuplicate = false;
+    private bool readyOrderLines = false;
+    private bool seeItemsInOrder = false;
+    private bool doneBool = false;
+    private string FilterFunction { get; set; }
+    private Order prepNewOrder = new Order();
+    private Order seeMyItems;
+    private Order updatedOrder = new Order();
+    private Order closeOpenSeeItems = new Order();
+    private Order closeOpenUpdateOrder = new Order();
+    private OrderLine prepNewOrderLine = new OrderLine();
+    private List<OrderLine> prepareOrderLine;
+    private List<OrderLine> seeMyItemsSpec;
+    private List<Customer> displayCustomers;
+    private List<Product> displayProducts;
+    private List<Order> displayOrders;
 
 
     protected override async Task OnInitializedAsync()
@@ -222,12 +222,8 @@ else
         await orderRepo.DeleteNoItemsOrders();
     }
 
-
-
-    private async Task PrepareNewOrderLine(OrderLine addOrderLine) //////////////
+    private async Task PrepareNewOrderLine(OrderLine addOrderLine)
     {
-        //gör en metod där jag gör en orderlist som är kopplad mot det tidigare prepOrder objektet
-
         if (seeMyItemsSpec != null)
         {
             List<OrderLine> ordLine = seeMyItemsSpec.Where(p => p.ProductId == addOrderLine.ProductId).ToList();
@@ -236,15 +232,12 @@ else
                 seeMyItemsSpec.Add(addOrderLine);
             }
         }
-
         await orderRepo.AddNewOrderLine(addOrderLine, prepNewOrder);
         prepNewOrderLine = new OrderLine();
     }
 
-    private async Task AddNewOrder(Order o) /////////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
+    private async Task AddNewOrder(Order o)
     {
-        //en order måste ha en kund, om den inte finns så kan den inte skapas
-        //avoid duplicate
         prepNewOrder = new Order();
         if (avoidDuplicate == false)
         {
@@ -255,28 +248,21 @@ else
 
     private void AddItem(Order bindToOrder)
     {
-        readyOrderLines = true; //vi öppnar upp add item formuläret
+        readyOrderLines = true;
         prepNewOrder = bindToOrder;
     }
 
-    private async Task PrepareNewOrder(Order prepareForOrder) //////////////// vi vill visa alternativen vilka produkter finns och hur många sen kan man lägga en order
+    private async Task PrepareNewOrder(Order prepareForOrder)
     {
-        //en order måste ha en kund, om den inte finns så kan den inte skapas
-        //placeOrder = true;
         readyOrderLines = true;
-
-        await orderRepo.AddNewOrder(prepareForOrder); //lägger till okbjektet
-                                                      //activeOrders.Add(o); //lägger till i denna lista tillfälligt för att göra så att vi kan gå vidare till orderlines
-
+        await orderRepo.AddNewOrder(prepareForOrder);
     }
 
     private async Task NewOrderAndOrderLines(Order firstOrder, OrderLine orderLineItem)
-    { //lägga till ordern i listan OM det är vårat första item, samt först orderline i listan
-      //om det inte är vårat första item så ska den endast uppdatera i listan för orderline
-
+    {
         prepareOrderLine = await orderRepo.GetOrderLinesAsync();
 
-        if (!displayOrders.Contains(firstOrder))
+        if (!displayOrders.Contains(firstOrder)) //Adds the order to the list if it's the first item. Otherwise it just updates the list.
         {
             displayOrders.Add(firstOrder);
         }
@@ -284,35 +270,27 @@ else
         prepareOrderLine.Add(orderLineItem);
         await PrepareNewOrderLine(orderLineItem);
         doneBool = true;
-        seeMyItemsSpec = prepareOrderLine.Where(b => b.Order == firstOrder).ToList(); //uppdaterar items-listan i guin
+        seeMyItemsSpec = prepareOrderLine.Where(b => b.Order == firstOrder).ToList(); //Updates the "See items"-list.
     }
 
-
-    //uppdateringsfunktinoalitet för ordrar
-
-    Order updatedOrder = new Order();
-    //Product updatedProduct = new Product();
-
-    Order closeOpenSeeItems = new Order();
-    Order closeOpenUpdateOrder = new Order();
 
     private async Task ProcessBatchorders(List<Order> allOrders)
     {
         await orderRepo.BatchAndProcess(allOrders);
 
     }
+
     private async Task UpdateOrder()
     {
         await orderRepo.UpdateOrder(updatedOrder);
         IsUpdating = false;
     }
 
-
     private async Task DeleteItem(OrderLine itemToBeDeleted)
     {
         if (seeMyItemsSpec != null)
         {
-            seeMyItemsSpec.Remove(itemToBeDeleted); //tar bort från  våran lista som visas i gui
+            seeMyItemsSpec.Remove(itemToBeDeleted); //Removes the item from the "See items"-list.
 
         }
         if (itemToBeDeleted.Order.Items.Count() == 1)
@@ -325,7 +303,6 @@ else
     }
     private void SetForUpdate(Order selectedOrder)
     {
-
         if (IsUpdating == true && closeOpenUpdateOrder == selectedOrder)
         {
             IsUpdating = false;
@@ -336,7 +313,6 @@ else
             updatedOrder = selectedOrder;
             IsUpdating = true;
         }
-
     }
 
     private async Task SetPayment(bool payedOrNot, Order order)
@@ -353,9 +329,9 @@ else
         await orderRepo.DeleteNoItemsOrders();
     }
 
-    private void SeeItemsInOrder(Order seeInOrder) //Vi vill se vilka items som finns i en order och produkter kopplade till orderlines
+    private void SeeItemsInOrder(Order seeInOrder) //Method to see what items exist in an order.
     {
-        if (seeItemsInOrder == true && seeInOrder == closeOpenSeeItems) //gör så att vi kan klicka på knappen igen och fönstret stänger
+        if (seeItemsInOrder == true && seeInOrder == closeOpenSeeItems) //Let's us open and close the window by pressing the "See items" button.
         {
             seeItemsInOrder = false;
         }
@@ -368,7 +344,6 @@ else
         }
     }
 
-    public string FilterFunction { get; set; }
     private async Task FilterGUI()
     {
         switch (FilterFunction)

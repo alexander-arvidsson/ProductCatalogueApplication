@@ -101,15 +101,18 @@ else
 <p></p>
 
 @code{
-    List<Product> displayProducts;
-    bool toUpdate = false;
+
+    private bool toUpdate = false;
+    private string FilterFunction { get; set; }
+    private Product newProduct = new Product();
+    private Product updateProduct = new Product();
+    private List<Product> displayProducts;
 
     protected override async Task OnInitializedAsync()
     {
         displayProducts = await productRepo.GetProductsAsync();
     }
 
-    Product newProduct = new Product();
     private async Task AddProduct(Product p)
     {
         await productRepo.AddProduct(newProduct);
@@ -124,7 +127,6 @@ else
         displayProducts.Remove(p);
     }
 
-    Product updateProduct = new Product();
     private void SetProductForUpdate(Product selected)
     {
         updateProduct = selected;
@@ -137,7 +139,6 @@ else
         toUpdate = false;
     }
 
-    public string FilterFunction { get; set; }
     private async Task FilterGUI()
     {
         switch (FilterFunction)

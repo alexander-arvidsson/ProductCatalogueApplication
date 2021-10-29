@@ -30,7 +30,6 @@ namespace ProductCatalogueApplication.Data
 
         [Required]
         [Range(0, int.MaxValue)]
-
         /// <summary>
         /// The customer ID saved as an int.
         /// </summary>
@@ -40,8 +39,6 @@ namespace ProductCatalogueApplication.Data
             set { _customerId = value; }
         }
 
-        //[Required]
-
         /// <summary>
         /// A customer saved as a Customer object.
         /// </summary>
@@ -50,8 +47,6 @@ namespace ProductCatalogueApplication.Data
             get { return _customer; }
             set { _customer = value; }
         }
-
-        //[Required]
 
         /// <summary>
         /// The date the order was made saved as a DateTime data type.
@@ -64,7 +59,6 @@ namespace ProductCatalogueApplication.Data
 
         [Required(ErrorMessage = "A delivery adress is required")]
         [StringLength(40, ErrorMessage = " {0} length must be between {2} and {1}. ", MinimumLength = 1)]
-
         /// <summary>
         /// The delivery adress of the order saved as a string.
         /// </summary>
@@ -75,7 +69,6 @@ namespace ProductCatalogueApplication.Data
         }
 
         [Required]
-
         /// <summary>
         /// A bool that describes whether or not a payment has been completed.
         /// </summary>
@@ -86,7 +79,6 @@ namespace ProductCatalogueApplication.Data
         }
 
         [Required]
-
         /// <summary>
         /// A bool that describes whether or not an order has been dispatched.
         /// </summary>

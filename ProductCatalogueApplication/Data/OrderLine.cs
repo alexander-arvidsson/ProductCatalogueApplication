@@ -15,9 +15,6 @@ namespace ProductCatalogueApplication.Data
         private Order _order;
         private int _quantity;
 
-        //[Required]
-        //[Range(1, int.MaxValue)]
-
         /// <summary>
         /// The unique orderline stored in an int.
         /// </summary>
@@ -37,7 +34,6 @@ namespace ProductCatalogueApplication.Data
             set { _productid = value; }
         }
 
-        //[Required]
         /// <summary>
         /// A product object of the Product class.
         /// </summary>
@@ -47,7 +43,6 @@ namespace ProductCatalogueApplication.Data
             set { _product = value; }
         }
 
-        //[Required]
         /// <summary>
         /// The order ID stored in an int.
         /// </summary>
@@ -57,7 +52,6 @@ namespace ProductCatalogueApplication.Data
             set { _orderid = value; }
         }
 
-        //[Required]
         /// <summary>
         /// An order object of the Order class
         /// </summary>
