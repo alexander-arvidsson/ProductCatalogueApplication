@@ -344,7 +344,6 @@ namespace ProductCatalogueApplication.Data
             }
             await _context.SaveChangesAsync();
         }
-
     }
 }
 
